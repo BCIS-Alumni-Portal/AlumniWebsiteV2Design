@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BCIS Graduation Book</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --red: oklch(43% 0.12 27);
+      --ink: oklch(16% 0.006 27);
+      --paper: oklch(98% 0.009 27);
+      --paper-warm: oklch(94% 0.014 63);
+      --linen: oklch(86% 0.018 72);
+      --linen-edge: oklch(74% 0.022 72);
+      --muted: oklch(49% 0.014 27);
+      --glass: oklch(99% 0.005 27 / 0.78);
+      --shadow: 0 46px 95px oklch(16% 0.02 27 / 0.24);
+      --deep-shadow: 0 70px 130px oklch(12% 0.02 27 / 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Montserrat", sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      touch-action: none;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    .gallery-page {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 74% 45%, oklch(43% 0.12 27 / 0.055), transparent 30%),
+        radial-gradient(circle at 18% 78%, oklch(16% 0.006 27 / 0.048), transparent 32%),
+        linear-gradient(115deg, transparent 0 65%, oklch(97% 0.012 27 / 0.76) 65% 78%, transparent 78%),
+        var(--paper);
+      perspective: 1900px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .gallery-page.is-dragging {
+      cursor: grabbing;
+    }
+
+    .topbar {
+      position: fixed;
+      left: 18px;
+      right: 18px;
+      top: 16px;
+      z-index: 30;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .brand-link,
+    .info-button,
+    .back-link {
+      pointer-events: auto;
+    }
+
+    .brand-link {
+      width: min(278px, calc(100vw - 150px));
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 0 17px;
+      border: 1px solid oklch(16% 0.006 27 / 0.13);
+      border-radius: 10px;
+      background: var(--glass);
+      color: var(--ink);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      font-weight: 800;
+      backdrop-filter: blur(18px);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      position: relative;
+    }
+
+    .back-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 15px;
+      border: 1px solid oklch(16% 0.006 27 / 0.13);
+      border-radius: 999px;
+      background: var(--glass);
+      color: var(--ink);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+      font-weight: 800;
+      backdrop-filter: blur(18px);
+    }
+
+    .info-button {
+      width: 44px;
+      height: 44px;
+      border: 1px solid oklch(16% 0.006 27 / 0.13);
+      border-radius: 50%;
+      background: var(--glass);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 800;
+      backdrop-filter: blur(18px);
+    }
+
+    .info-panel {
+      position: absolute;
+      right: 0;
+      top: 56px;
+      width: min(318px, calc(100vw - 36px));
+      padding: 18px;
+      border-radius: 18px;
+      background: oklch(99% 0.006 27 / 0.9);
+      box-shadow: 0 26px 75px oklch(16% 0.02 27 / 0.14);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease;
+      backdrop-filter: blur(18px);
+    }
+
+    .info-panel.is-open,
+    .info-button:hover + .info-panel,
+    .info-button:focus-visible + .info-panel {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .info-panel strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .floating-previews {
+      --preview-x: 50vw;
+      --preview-y: 122px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 26;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate3d(var(--preview-x), var(--preview-y), 0) scale(0.96);
+      transition:
+        opacity 260ms ease,
+        transform 520ms cubic-bezier(.16,.84,.2,1);
+    }
+
+    .floating-previews.is-visible {
+      opacity: 1;
+      transform: translate3d(var(--preview-x), var(--preview-y), 0) scale(1);
+    }
+
+    .floating-photo {
+      position: absolute;
+      width: clamp(220px, 19vw, 360px);
+      height: clamp(145px, 12.8vw, 240px);
+      border: 7px solid oklch(99% 0.006 72 / 0.94);
+      border-radius: 3px;
+      background: var(--floating-photo);
+      box-shadow: 0 30px 70px oklch(12% 0.02 27 / 0.24);
+      opacity: 0;
+      transform: translate3d(0, 22px, 0) rotate(var(--r));
+      transition:
+        opacity 320ms ease,
+        transform 620ms cubic-bezier(.16,.84,.2,1);
+    }
+
+    .floating-previews.is-visible .floating-photo {
+      opacity: 1;
+    }
+
+    .floating-photo.one {
+      --r: -4deg;
+      left: -30px;
+      top: 0;
+      z-index: 3;
+    }
+
+    .floating-photo.two {
+      --r: 5deg;
+      left: 190px;
+      top: 72px;
+      z-index: 2;
+      transition-delay: 50ms;
+    }
+
+    .floating-photo.three {
+      --r: -7deg;
+      left: 70px;
+      top: 210px;
+      z-index: 1;
+      transition-delay: 90ms;
+    }
+
+    .floating-previews.is-visible .floating-photo.one {
+      transform: translate3d(-22px, -10px, 0) rotate(-4deg);
+    }
+
+    .floating-previews.is-visible .floating-photo.two {
+      transform: translate3d(18px, 0, 0) rotate(5deg);
+    }
+
+    .floating-previews.is-visible .floating-photo.three {
+      transform: translate3d(-2px, 12px, 0) rotate(-7deg);
+    }
+
+    .floating-previews[data-side="right"] .floating-photo.one {
+      left: -350px;
+      transform-origin: right center;
+    }
+
+    .floating-previews[data-side="right"] .floating-photo.two {
+      left: -560px;
+      transform-origin: right center;
+    }
+
+    .floating-previews[data-side="right"] .floating-photo.three {
+      left: -430px;
+      transform-origin: right center;
+    }
+
+    .track {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 2300px;
+      height: 1220px;
+      transform-style: preserve-3d;
+      transform:
+        translate3d(-50%, -50%, 0)
+        rotateX(7deg)
+        rotateY(-29deg)
+        rotateZ(-8deg);
+      will-change: transform;
+    }
+
+    .depth-line {
+      position: absolute;
+      left: 250px;
+      right: 250px;
+      top: 50%;
+      height: 1px;
+      transform: translateY(-50%) translateZ(-520px);
+      background: linear-gradient(90deg, transparent, oklch(16% 0.006 27 / 0.09), transparent);
+    }
+
+    .book {
+      --tx: 0px;
+      --ty: 0px;
+      --tz: 0px;
+      --scale: 1;
+      --opacity: 1;
+      --blur: 0px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 260px;
+      height: 346px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      opacity: var(--opacity);
+      filter: blur(var(--blur));
+      transform:
+        translate3d(var(--tx), var(--ty), var(--tz))
+        scale(var(--scale))
+        rotateY(10deg);
+      transform-style: preserve-3d;
+      transition:
+        transform 620ms cubic-bezier(.16,.84,.2,1),
+        filter 320ms ease,
+        opacity 320ms ease;
+      will-change: transform;
+      font-family: inherit;
+      pointer-events: auto;
+    }
+
+    .book:hover,
+    .book:focus-visible,
+    .book.is-proximity-hover {
+      outline: none;
+      transform:
+        translate3d(calc(var(--tx) - 74px), calc(var(--ty) - 18px), calc(var(--tz) + 170px))
+        scale(calc(var(--scale) * 1.045))
+        rotateY(-3deg);
+      z-index: 999 !important;
+      filter: blur(0);
+    }
+
+    .album-pages {
+      position: absolute;
+      left: 13px;
+      right: -12px;
+      top: 8px;
+      bottom: -8px;
+      border-radius: 6px 16px 16px 6px;
+      background:
+        linear-gradient(90deg, oklch(16% 0.006 27 / 0.06), transparent 14%),
+        repeating-linear-gradient(180deg, oklch(98% 0.011 70) 0 2px, oklch(89% 0.019 72) 2px 3px);
+      box-shadow: 14px 18px 35px oklch(16% 0.02 27 / 0.16);
+      transform: translateZ(3px);
+    }
+
+    .album-edge {
+      position: absolute;
+      right: -14px;
+      top: 11px;
+      width: 24px;
+      height: calc(100% - 12px);
+      border-radius: 0 16px 16px 0;
+      background:
+        linear-gradient(90deg, var(--linen-edge), oklch(96% 0.015 72) 48%, oklch(80% 0.018 72));
+      box-shadow: inset -8px 0 14px oklch(16% 0.006 27 / 0.13);
+      transform: rotateY(80deg) translateZ(16px);
+      transform-origin: left center;
+    }
+
+    .album-cover {
+      position: absolute;
+      inset: 0;
+      border-radius: 7px 17px 17px 7px;
+      background:
+        radial-gradient(circle at 38% 20%, oklch(100% 0.006 72 / 0.36), transparent 21%),
+        linear-gradient(135deg, oklch(100% 0.006 72 / 0.22), transparent 44%),
+        linear-gradient(90deg, oklch(16% 0.006 27 / 0.18), transparent 6%, transparent 90%, oklch(16% 0.006 27 / 0.08)),
+        var(--cover);
+      box-shadow: var(--shadow);
+      transform: translateZ(21px);
+      overflow: hidden;
+    }
+
+    .album-cover::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(45deg, oklch(100% 0.006 72 / 0.08) 25%, transparent 25%),
+        linear-gradient(-45deg, oklch(16% 0.006 27 / 0.035) 25%, transparent 25%);
+      background-size: 8px 8px;
+      opacity: 0.42;
+    }
+
+    .album-spine {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 22px;
+      height: 100%;
+      background:
+        linear-gradient(90deg, oklch(16% 0.006 27 / 0.22), oklch(100% 0.006 72 / 0.12), oklch(16% 0.006 27 / 0.04)),
+        var(--spine);
+      z-index: 3;
+    }
+
+    .album-lip {
+      position: absolute;
+      left: 20px;
+      right: 18px;
+      top: 10px;
+      height: 14px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, oklch(100% 0.006 72 / 0.52), oklch(80% 0.018 72 / 0.18));
+      opacity: 0.7;
+      z-index: 3;
+    }
+
+    .album-title {
+      position: absolute;
+      right: 26px;
+      bottom: 44px;
+      z-index: 4;
+      width: 170px;
+      color: var(--title);
+      text-align: right;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.06;
+      font-size: 21px;
+      font-weight: 500;
+      text-shadow: 0 1px 0 oklch(100% 0.006 72 / 0.3);
+    }
+
+    .album-title strong {
+      display: block;
+      font-size: 30px;
+      letter-spacing: 0.02em;
+      font-weight: 500;
+    }
+
+    .preview-photo {
+      position: absolute;
+      width: 188px;
+      height: 132px;
+      border: 5px solid oklch(99% 0.006 72 / 0.94);
+      background: var(--photo);
+      box-shadow: 0 26px 50px oklch(12% 0.02 27 / 0.25);
+      opacity: 0;
+      transform: translate3d(18px, 28px, 0) rotate(var(--rotate));
+      transition:
+        opacity 300ms ease,
+        transform 680ms cubic-bezier(.16,.84,.2,1);
+      pointer-events: none;
+      z-index: 14;
+    }
+
+    .photo-one {
+      right: -138px;
+      top: -18px;
+      --rotate: 4deg;
+      --photo: linear-gradient(135deg, oklch(18% 0.01 27), oklch(43% 0.12 27), oklch(90% 0.018 27));
+    }
+
+    .photo-two {
+      right: -184px;
+      top: 126px;
+      --rotate: -7deg;
+      --photo: linear-gradient(135deg, oklch(89% 0.015 72), oklch(99% 0.006 72));
+      transition-delay: 45ms;
+    }
+
+    .photo-three {
+      right: -108px;
+      top: 270px;
+      --rotate: 8deg;
+      --photo: linear-gradient(135deg, oklch(54% 0.012 27), oklch(16% 0.006 27));
+      transition-delay: 80ms;
+    }
+
+    .book[data-side="left"] .photo-one {
+      left: -138px;
+      right: auto;
+      --rotate: -4deg;
+    }
+
+    .book[data-side="left"] .photo-two {
+      left: -184px;
+      right: auto;
+      --rotate: 7deg;
+    }
+
+    .book[data-side="left"] .photo-three {
+      left: -108px;
+      right: auto;
+      --rotate: -8deg;
+    }
+
+    .book:hover .preview-photo,
+    .book:focus-visible .preview-photo,
+    .book.is-proximity-hover .preview-photo {
+      opacity: 0;
+    }
+
+    .book:hover .photo-one,
+    .book:focus-visible .photo-one,
+    .book.is-proximity-hover .photo-one {
+      transform: translate3d(84px, -34px, 92px) rotate(4deg);
+    }
+
+    .book:hover .photo-two,
+    .book:focus-visible .photo-two,
+    .book.is-proximity-hover .photo-two {
+      transform: translate3d(118px, 0, 82px) rotate(-7deg);
+    }
+
+    .book:hover .photo-three,
+    .book:focus-visible .photo-three,
+    .book.is-proximity-hover .photo-three {
+      transform: translate3d(70px, 40px, 74px) rotate(8deg);
+    }
+
+    .book[data-side="left"]:hover .photo-one,
+    .book[data-side="left"]:focus-visible .photo-one,
+    .book[data-side="left"].is-proximity-hover .photo-one {
+      transform: translate3d(-84px, -34px, 92px) rotate(-4deg);
+    }
+
+    .book[data-side="left"]:hover .photo-two,
+    .book[data-side="left"]:focus-visible .photo-two,
+    .book[data-side="left"].is-proximity-hover .photo-two {
+      transform: translate3d(-118px, 0, 82px) rotate(7deg);
+    }
+
+    .book[data-side="left"]:hover .photo-three,
+    .book[data-side="left"]:focus-visible .photo-three,
+    .book[data-side="left"].is-proximity-hover .photo-three {
+      transform: translate3d(-70px, 40px, 74px) rotate(-8deg);
+    }
+
+    .open-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 12;
+      min-width: max-content;
+      padding: 13px 17px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--paper);
+      opacity: 0;
+      transform: translate(-50%, -50%) translateZ(82px) scale(0.92);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      font-weight: 800;
+      transition: opacity 240ms ease, transform 240ms ease;
+      pointer-events: none;
+    }
+
+    .open-label::after {
+      content: " ↗";
+    }
+
+    .book:hover .open-label,
+    .book:focus-visible .open-label,
+    .book.is-proximity-hover .open-label {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateZ(82px) scale(1);
+    }
+
+    .progress-hint {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      z-index: 28;
+      color: oklch(16% 0.006 27 / 0.42);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 11px;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    .reader {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 4vw, 42px);
+      background: oklch(16% 0.006 27 / 0.66);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 320ms ease;
+    }
+
+    .reader.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .reader-shell {
+      position: relative;
+      width: min(1190px, 96vw);
+      height: min(760px, 88vh);
+      perspective: 2200px;
+      transform: scale(0.92) translateY(18px);
+      transition: transform 460ms cubic-bezier(.16,.84,.2,1);
+    }
+
+    .reader.is-open .reader-shell {
+      transform: scale(1) translateY(0);
+    }
+
+    .spread {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      filter: drop-shadow(0 48px 92px oklch(12% 0.02 27 / 0.46));
+      transition: transform 360ms cubic-bezier(.16,.84,.2,1), opacity 260ms ease;
+    }
+
+    .spread.is-turning-next {
+      opacity: 0.55;
+      transform: rotateY(-8deg) translateX(-20px);
+    }
+
+    .spread.is-turning-prev {
+      opacity: 0.55;
+      transform: rotateY(8deg) translateX(20px);
+    }
+
+    .spread-page {
+      position: relative;
+      padding: clamp(24px, 3vw, 44px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 14%, oklch(100% 0.006 72), transparent 24%),
+        oklch(98% 0.011 72);
+    }
+
+    .spread-page.left {
+      border-radius: 24px 4px 4px 24px;
+      transform-origin: right center;
+      transform: rotateY(6deg);
+    }
+
+    .spread-page.right {
+      border-radius: 4px 24px 24px 4px;
+      transform-origin: left center;
+      transform: rotateY(-6deg);
+    }
+
+    .book-gutter {
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 50%;
+      z-index: 5;
+      width: 22px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: linear-gradient(90deg, oklch(12% 0.02 27 / 0.22), oklch(100% 0.006 72 / 0.18), oklch(12% 0.02 27 / 0.18));
+      opacity: 0.35;
+    }
+
+    .spread-title {
+      margin: 42px 0 0;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 0.86;
+      font-size: clamp(48px, 6vw, 90px);
+      font-weight: 400;
+    }
+
+    .spread-title span {
+      color: var(--red);
+    }
+
+    .spread-copy {
+      position: absolute;
+      left: clamp(24px, 3vw, 44px);
+      bottom: clamp(24px, 3vw, 44px);
+      max-width: 350px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .spread-counter {
+      position: absolute;
+      left: clamp(24px, 3vw, 44px);
+      top: clamp(24px, 3vw, 44px);
+      color: oklch(16% 0.006 27 / 0.42);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .photo-grid {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-rows: 1fr 0.76fr;
+      gap: 14px;
+    }
+
+    .placeholder-photo {
+      min-height: 0;
+      border-radius: 12px;
+      background: var(--photo-fill);
+      box-shadow: inset 0 0 0 1px oklch(16% 0.006 27 / 0.05);
+      transition: background 260ms ease;
+    }
+
+    .placeholder-photo.main {
+      grid-row: span 2;
+      --photo-fill: linear-gradient(135deg, oklch(16% 0.006 27), oklch(43% 0.12 27) 74%, oklch(90% 0.018 27));
+    }
+
+    .placeholder-photo.secondary {
+      --photo-fill: linear-gradient(135deg, oklch(87% 0.018 72), oklch(99% 0.006 72));
+    }
+
+    .placeholder-photo.tertiary {
+      --photo-fill: linear-gradient(135deg, oklch(43% 0.12 27), oklch(16% 0.006 27));
+    }
+
+    .close-reader,
+    .reader-arrow {
+      position: absolute;
+      z-index: 10;
+      border: 0;
+      background: var(--ink);
+      color: var(--paper);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 800;
+    }
+
+    .close-reader {
+      right: 0;
+      top: -54px;
+      border-radius: 999px;
+      padding: 13px 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+    }
+
+    .reader-arrow {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+    }
+
+    .reader-arrow.prev {
+      left: -24px;
+    }
+
+    .reader-arrow.next {
+      right: -24px;
+    }
+
+    .reader-timer {
+      position: absolute;
+      left: 50%;
+      bottom: -34px;
+      width: min(320px, 56vw);
+      height: 3px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: oklch(98% 0.009 27 / 0.22);
+      transform: translateX(-50%);
+    }
+
+    .reader-timer span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--paper);
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+
+    .reader.is-open .reader-timer span {
+      animation: pageTimer 3000ms linear infinite;
+    }
+
+    @keyframes pageTimer {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @media (max-width: 900px) {
+      .book {
+        width: 214px;
+        height: 286px;
+      }
+
+      .album-title {
+        width: 145px;
+        right: 22px;
+        bottom: 36px;
+        font-size: 17px;
+      }
+
+      .album-title strong {
+        font-size: 25px;
+      }
+
+      .preview-photo {
+        width: 148px;
+        height: 104px;
+      }
+
+      .floating-photo {
+        width: clamp(190px, 24vw, 270px);
+        height: clamp(126px, 16vw, 180px);
+      }
+
+      .track {
+        width: 1500px;
+        height: 980px;
+        transform:
+          translate3d(-50%, -50%, 0)
+          rotateX(5deg)
+          rotateY(-25deg)
+          rotateZ(-8deg);
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        overflow-y: auto;
+        touch-action: pan-y;
+      }
+
+      .gallery-page {
+        height: 1120px;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .brand-link {
+        min-height: 48px;
+        width: auto;
+        max-width: calc(100vw - 126px);
+        font-size: 11px;
+      }
+
+      .back-link {
+        display: none;
+      }
+
+      .stage {
+        overflow: hidden;
+      }
+
+      .track {
+        top: 570px;
+        width: 820px;
+        height: 1350px;
+        transform:
+          translate3d(-50%, -50%, 0)
+          rotateX(3deg)
+          rotateY(-22deg)
+          rotateZ(-8deg);
+      }
+
+      .book {
+        width: 168px;
+        height: 224px;
+      }
+
+      .open-label {
+        opacity: 0;
+        font-size: 10px;
+        padding: 10px 12px;
+      }
+
+      .preview-photo {
+        display: none;
+      }
+
+      .floating-previews {
+        --preview-y: 98px;
+      }
+
+      .floating-photo {
+        width: 190px;
+        height: 126px;
+        border-width: 5px;
+      }
+
+      .floating-photo.two {
+        left: 112px;
+        top: 52px;
+      }
+
+      .floating-photo.three {
+        left: 44px;
+        top: 132px;
+      }
+
+      .floating-previews[data-side="right"] .floating-photo.one {
+        left: -180px;
+      }
+
+      .floating-previews[data-side="right"] .floating-photo.two {
+        left: -292px;
+      }
+
+      .floating-previews[data-side="right"] .floating-photo.three {
+        left: -224px;
+      }
+
+      .progress-hint {
+        left: 18px;
+        bottom: 14px;
+      }
+
+      .spread {
+        grid-template-columns: 1fr;
+      }
+
+      .spread-page.left,
+      .spread-page.right {
+        transform: none;
+      }
+
+      .spread-page.left {
+        min-height: 34%;
+        border-radius: 22px 22px 4px 4px;
+      }
+
+      .spread-page.right {
+        border-radius: 4px 4px 22px 22px;
+      }
+
+      .book-gutter {
+        left: 12px;
+        right: 12px;
+        top: 34%;
+        bottom: auto;
+        width: auto;
+        height: 18px;
+        transform: translateY(-50%);
+      }
+
+      .reader-shell {
+        height: 86vh;
+      }
+
+      .reader-arrow {
+        top: auto;
+        bottom: 10px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .reader-arrow.prev {
+        left: 8px;
+      }
+
+      .reader-arrow.next {
+        right: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="gallery-page" id="galleryPage">
+    <header class="topbar">
+      <a class="brand-link" href="homepage copy.html">Graduation Book</a>
+      <div class="top-actions">
+        <a class="back-link" href="homepage copy.html">Back to portal</a>
+        <button class="info-button" type="button" aria-expanded="false" aria-controls="infoPanel">i</button>
+        <div class="info-panel" id="infoPanel">
+          <strong>How to explore</strong>
+          Scroll or drag to move through the graduation books. Hover an album to preview images from that year. Click to open the book, then click, swipe, or wait for the pages to turn.
+        </div>
+      </div>
+    </header>
+
+    <section class="stage" aria-label="Graduation book archive">
+      <div class="track" id="bookTrack">
+        <div class="depth-line" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <div class="floating-previews" id="floatingPreviews" aria-hidden="true">
+      <div class="floating-photo one" id="floatingPhotoOne"></div>
+      <div class="floating-photo two" id="floatingPhotoTwo"></div>
+      <div class="floating-photo three" id="floatingPhotoThree"></div>
+    </div>
+
+    <div class="progress-hint">Scroll / drag through years</div>
+  </main>
+
+  <section class="reader" id="reader" aria-hidden="true">
+    <div class="reader-shell" role="dialog" aria-modal="true" aria-label="Open graduation book">
+      <button class="close-reader" type="button">Close</button>
+      <button class="reader-arrow prev" type="button" aria-label="Previous spread">←</button>
+      <div class="spread">
+        <div class="spread-page left">
+          <div class="spread-counter" id="spreadCounter">Spread 01 / 04</div>
+          <h1 class="spread-title">Class of<br><span id="readerYear">2026</span></h1>
+          <p class="spread-copy" id="spreadCopy">Graduation ceremony, portraits, backstage moments, and highlights from the final school year. Replace these blocks with real photos when the archive content is ready.</p>
+        </div>
+        <div class="spread-page right">
+          <div class="photo-grid">
+            <div class="placeholder-photo main" id="photoMain"></div>
+            <div class="placeholder-photo secondary" id="photoSecondary"></div>
+            <div class="placeholder-photo tertiary" id="photoTertiary"></div>
+          </div>
+        </div>
+        <div class="book-gutter" aria-hidden="true"></div>
+      </div>
+      <button class="reader-arrow next" type="button" aria-label="Next spread">→</button>
+      <div class="reader-timer" aria-hidden="true"><span id="readerTimer"></span></div>
+    </div>
+  </section>
+
+  <script>
+    const years = Array.from({ length: 17 }, (_, index) => 2010 + index);
+    const track = document.getElementById('bookTrack');
+    const page = document.getElementById('galleryPage');
+    const reader = document.getElementById('reader');
+    const spread = document.querySelector('.spread');
+    const readerYear = document.getElementById('readerYear');
+    const spreadCounter = document.getElementById('spreadCounter');
+    const spreadCopy = document.getElementById('spreadCopy');
+    const photoMain = document.getElementById('photoMain');
+    const photoSecondary = document.getElementById('photoSecondary');
+    const photoTertiary = document.getElementById('photoTertiary');
+    const infoButton = document.querySelector('.info-button');
+    const infoPanel = document.getElementById('infoPanel');
+    const floatingPreviews = document.getElementById('floatingPreviews');
+    const floatingPhotoOne = document.getElementById('floatingPhotoOne');
+    const floatingPhotoTwo = document.getElementById('floatingPhotoTwo');
+    const floatingPhotoThree = document.getElementById('floatingPhotoThree');
+    let progress = years.length - 1;
+    let targetProgress = years.length - 1;
+    let isDragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragMoved = false;
+    let hoveredBook = null;
+    let activeYear = 2026;
+    let activeSpread = 0;
+    let autoFlipTimer = null;
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+
+    const coverThemes = [
+      ['oklch(88% 0.018 72)', 'oklch(84% 0.021 72)', 'oklch(44% 0.07 70)'],
+      ['oklch(82% 0.014 92)', 'oklch(78% 0.017 92)', 'oklch(43% 0.12 27)'],
+      ['oklch(92% 0.012 58)', 'oklch(87% 0.016 58)', 'oklch(30% 0.02 27)'],
+      ['oklch(79% 0.012 27)', 'oklch(74% 0.014 27)', 'oklch(43% 0.12 27)']
+    ];
+
+    const spreadThemes = [
+      {
+        label: 'Ceremony highlights',
+        copy: 'The opening procession, diploma moments, and the stage photographs that anchor the year.',
+        photos: [
+          'linear-gradient(135deg, oklch(16% 0.006 27), oklch(43% 0.12 27) 74%, oklch(90% 0.018 27))',
+          'linear-gradient(135deg, oklch(87% 0.018 72), oklch(99% 0.006 72))',
+          'linear-gradient(135deg, oklch(43% 0.12 27), oklch(16% 0.006 27))'
+        ]
+      },
+      {
+        label: 'Class portraits',
+        copy: 'Portraits, group photos, and the quieter details that make the graduating class feel personal.',
+        photos: [
+          'linear-gradient(135deg, oklch(78% 0.014 27), oklch(96% 0.01 72))',
+          'linear-gradient(135deg, oklch(20% 0.008 27), oklch(60% 0.018 27))',
+          'linear-gradient(135deg, oklch(91% 0.018 72), oklch(72% 0.02 72))'
+        ]
+      },
+      {
+        label: 'Behind the scenes',
+        copy: 'Backstage setup, friends waiting off-camera, and the in-between photographs people actually remember.',
+        photos: [
+          'linear-gradient(135deg, oklch(23% 0.012 27), oklch(88% 0.018 72))',
+          'linear-gradient(135deg, oklch(43% 0.12 27), oklch(82% 0.014 92))',
+          'linear-gradient(135deg, oklch(16% 0.006 27), oklch(92% 0.012 58))'
+        ]
+      },
+      {
+        label: 'Final memories',
+        copy: 'Campus moments, handwritten notes, and the last images before the year closes and the next book begins.',
+        photos: [
+          'linear-gradient(135deg, oklch(92% 0.012 58), oklch(43% 0.12 27))',
+          'linear-gradient(135deg, oklch(74% 0.022 72), oklch(99% 0.006 72))',
+          'linear-gradient(135deg, oklch(19% 0.01 27), oklch(49% 0.014 27))'
+        ]
+      }
+    ];
+
+    const previewThemes = [
+      [
+        'linear-gradient(135deg, oklch(18% 0.01 27), oklch(43% 0.12 27), oklch(90% 0.018 27))',
+        'linear-gradient(135deg, oklch(89% 0.015 72), oklch(99% 0.006 72))',
+        'linear-gradient(135deg, oklch(54% 0.012 27), oklch(16% 0.006 27))'
+      ],
+      [
+        'linear-gradient(135deg, oklch(22% 0.012 27), oklch(76% 0.014 72))',
+        'linear-gradient(135deg, oklch(43% 0.12 27), oklch(82% 0.014 92))',
+        'linear-gradient(135deg, oklch(92% 0.012 58), oklch(30% 0.02 27))'
+      ],
+      [
+        'linear-gradient(135deg, oklch(86% 0.017 72), oklch(43% 0.12 27))',
+        'linear-gradient(135deg, oklch(18% 0.01 27), oklch(70% 0.018 27))',
+        'linear-gradient(135deg, oklch(98% 0.011 72), oklch(74% 0.022 72))'
+      ]
+    ];
+
+    function createBook(year, index) {
+      const theme = coverThemes[index % coverThemes.length];
+      const book = document.createElement('button');
+      book.className = 'book';
+      book.type = 'button';
+      book.dataset.year = String(year);
+      book.setAttribute('aria-label', `Open class of ${year} graduation book`);
+      book.style.setProperty('--cover', theme[0]);
+      book.style.setProperty('--spine', theme[1]);
+      book.style.setProperty('--title', theme[2]);
+      book.innerHTML = `
+        <span class="album-pages"><\/span>
+        <span class="album-edge"><\/span>
+        <span class="album-cover">
+          <span class="album-spine"><\/span>
+          <span class="album-lip"><\/span>
+          <span class="album-title">Class of <strong>${year}<\/strong> Graduation Book<\/span>
+        <\/span>
+        <span class="preview-photo photo-one"><\/span>
+        <span class="preview-photo photo-two"><\/span>
+        <span class="preview-photo photo-three"><\/span>
+        <span class="open-label">Open ${year}<\/span>
+      `;
+      book.addEventListener('click', () => openReader(year));
+      track.appendChild(book);
+      return book;
+    }
+
+    const books = years.map(createBook);
+
+    function clearProximityHover() {
+      if (!hoveredBook) return;
+      hoveredBook.classList.remove('is-proximity-hover');
+      hoveredBook = null;
+      floatingPreviews.classList.remove('is-visible');
+    }
+
+    function setProximityHover(book) {
+      if (hoveredBook === book) return;
+      clearProximityHover();
+      hoveredBook = book;
+      if (!hoveredBook) return;
+      hoveredBook.classList.add('is-proximity-hover');
+      updateFloatingPreviews(hoveredBook);
+    }
+
+    function updateFloatingPreviews(book) {
+      const rect = book.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const index = Math.max(0, years.indexOf(Number(book.dataset.year)));
+      const theme = previewThemes[index % previewThemes.length];
+      const placeRight = centerX < window.innerWidth * 0.5;
+      const previewX = window.innerWidth <= 680
+        ? (placeRight ? 36 : window.innerWidth - 38)
+        : placeRight
+          ? Math.max(260, Math.min(window.innerWidth - 620, centerX + 150))
+          : Math.min(window.innerWidth - 130, Math.max(610, centerX - 160));
+      const previewY = window.innerWidth <= 680 ? 92 : 118;
+
+      floatingPhotoOne.style.setProperty('--floating-photo', theme[0]);
+      floatingPhotoTwo.style.setProperty('--floating-photo', theme[1]);
+      floatingPhotoThree.style.setProperty('--floating-photo', theme[2]);
+      floatingPreviews.dataset.side = placeRight ? 'left' : 'right';
+      floatingPreviews.style.setProperty('--preview-x', `${previewX}px`);
+      floatingPreviews.style.setProperty('--preview-y', `${previewY}px`);
+      floatingPreviews.classList.add('is-visible');
+    }
+
+    function updateProximityHover(clientX, clientY) {
+      if (reader.classList.contains('is-open') || isDragging) {
+        clearProximityHover();
+        return;
+      }
+
+      let closest = null;
+      let closestScore = Infinity;
+      const mobile = window.matchMedia('(max-width: 680px)').matches;
+      const maxDistance = mobile ? 120 : 170;
+
+      books.forEach((book) => {
+        const visualOpacity = Number(book.style.getPropertyValue('--opacity') || 0);
+        if (book.hidden || visualOpacity < 0.08) return;
+        const rect = book.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = Math.abs(clientX - centerX) / Math.max(rect.width, 1);
+        const dy = Math.abs(clientY - centerY) / Math.max(rect.height, 1);
+        const distance = Math.hypot(clientX - centerX, clientY - centerY);
+        const insideExpandedHitArea = dx < 0.95 && dy < 0.9;
+        const closeEnough = distance < maxDistance;
+
+        if ((insideExpandedHitArea || closeEnough) && distance < closestScore) {
+          closest = book;
+          closestScore = distance;
+        }
+      });
+
+      setProximityHover(closest);
+    }
+
+    function wrapOffset(value, total) {
+      return ((value + total / 2) % total + total) % total - total / 2;
+    }
+
+    function render() {
+      progress += (targetProgress - progress) * 0.12;
+      const total = years.length;
+      const mobile = window.matchMedia('(max-width: 680px)').matches;
+      const spacingX = mobile ? 118 : 218;
+      const spacingY = mobile ? 128 : 110;
+      const spacingZ = mobile ? 104 : 190;
+      const centerShift = mobile ? 0 : -110;
+
+      books.forEach((book, index) => {
+        const rel = wrapOffset(index - progress, total);
+        const abs = Math.abs(rel);
+        const visibility = Math.max(0, 1 - Math.max(0, abs - 7.1) / 2.2);
+        const depthScale = mobile
+          ? 0.92 + Math.max(-0.26, Math.min(0.24, rel * 0.035))
+          : 0.78 + Math.max(-0.34, Math.min(0.62, rel * 0.065));
+        const x = centerShift + rel * spacingX;
+        const y = rel * spacingY;
+        const z = rel * spacingZ;
+
+        book.style.setProperty('--tx', `${x.toFixed(2)}px`);
+        book.style.setProperty('--ty', `${y.toFixed(2)}px`);
+        book.style.setProperty('--tz', `${z.toFixed(2)}px`);
+        book.style.setProperty('--scale', depthScale.toFixed(3));
+        book.style.setProperty('--opacity', visibility.toFixed(3));
+        book.style.setProperty('--blur', abs > 6.2 ? '1.6px' : '0px');
+        book.style.zIndex = String(Math.round(200 + rel * 10));
+        book.dataset.side = rel > 0 ? 'left' : 'right';
+        book.style.pointerEvents = visibility > 0.08 ? 'auto' : 'none';
+        book.hidden = visibility <= 0.01;
+      });
+
+      if (hoveredBook && (hoveredBook.hidden || Number(hoveredBook.style.getPropertyValue('--opacity') || 0) < 0.08)) {
+        clearProximityHover();
+      }
+
+      if (hoveredBook) {
+        updateFloatingPreviews(hoveredBook);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    function step(delta) {
+      targetProgress += delta;
+      const total = years.length;
+      if (targetProgress > total) targetProgress -= total;
+      if (targetProgress < -total) targetProgress += total;
+    }
+
+    function renderSpread(direction = 'next') {
+      const content = spreadThemes[activeSpread];
+      spread.classList.remove('is-turning-next', 'is-turning-prev');
+      void spread.offsetWidth;
+      spread.classList.add(direction === 'prev' ? 'is-turning-prev' : 'is-turning-next');
+      window.setTimeout(() => {
+        spread.classList.remove('is-turning-next', 'is-turning-prev');
+      }, 280);
+
+      readerYear.textContent = String(activeYear);
+      spreadCounter.textContent = `${content.label} ${String(activeSpread + 1).padStart(2, '0')} / ${String(spreadThemes.length).padStart(2, '0')}`;
+      spreadCopy.textContent = content.copy;
+      photoMain.style.setProperty('--photo-fill', content.photos[0]);
+      photoSecondary.style.setProperty('--photo-fill', content.photos[1]);
+      photoTertiary.style.setProperty('--photo-fill', content.photos[2]);
+    }
+
+    function startAutoFlip() {
+      window.clearInterval(autoFlipTimer);
+      autoFlipTimer = window.setInterval(() => {
+        nextSpread(false);
+      }, 3000);
+    }
+
+    function stopAutoFlip() {
+      window.clearInterval(autoFlipTimer);
+      autoFlipTimer = null;
+    }
+
+    function openReader(year, spreadIndex = 0) {
+      activeYear = year;
+      activeSpread = spreadIndex;
+      renderSpread('next');
+      reader.classList.add('is-open');
+      reader.setAttribute('aria-hidden', 'false');
+      startAutoFlip();
+    }
+
+    function closeReader() {
+      reader.classList.remove('is-open');
+      reader.setAttribute('aria-hidden', 'true');
+      stopAutoFlip();
+    }
+
+    function nextBookYear() {
+      const index = years.indexOf(activeYear);
+      return years[(index + 1) % years.length];
+    }
+
+    function prevBookYear() {
+      const index = years.indexOf(activeYear);
+      return years[(index - 1 + years.length) % years.length];
+    }
+
+    function nextSpread(resetTimer = true) {
+      if (activeSpread < spreadThemes.length - 1) {
+        activeSpread += 1;
+        renderSpread('next');
+      } else {
+        activeYear = nextBookYear();
+        activeSpread = 0;
+        renderSpread('next');
+      }
+      if (resetTimer) startAutoFlip();
+    }
+
+    function prevSpread(resetTimer = true) {
+      if (activeSpread > 0) {
+        activeSpread -= 1;
+        renderSpread('prev');
+      } else {
+        activeYear = prevBookYear();
+        activeSpread = spreadThemes.length - 1;
+        renderSpread('prev');
+      }
+      if (resetTimer) startAutoFlip();
+    }
+
+    page.addEventListener('wheel', (event) => {
+      if (reader.classList.contains('is-open')) return;
+      event.preventDefault();
+      step((event.deltaY + event.deltaX * 0.25) * 0.0048);
+    }, { passive: false });
+
+    page.addEventListener('pointerdown', (event) => {
+      if (event.target.closest('a, button, .info-panel')) return;
+      isDragging = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      dragStartX = event.clientX;
+      dragStartY = event.clientY;
+      dragMoved = false;
+      page.classList.add('is-dragging');
+      page.setPointerCapture(event.pointerId);
+    });
+
+    page.addEventListener('pointermove', (event) => {
+      if (!isDragging || reader.classList.contains('is-open')) {
+        updateProximityHover(event.clientX, event.clientY);
+        return;
+      }
+      const dx = event.clientX - lastX;
+      const dy = event.clientY - lastY;
+      if (Math.hypot(event.clientX - dragStartX, event.clientY - dragStartY) > 8) {
+        dragMoved = true;
+      }
+      step((-dx + dy * 0.35) * 0.012);
+      lastX = event.clientX;
+      lastY = event.clientY;
+    });
+
+    page.addEventListener('pointerup', (event) => {
+      isDragging = false;
+      page.classList.remove('is-dragging');
+      if (!dragMoved && hoveredBook && !event.target.closest('a, button, .info-panel')) {
+        openReader(Number(hoveredBook.dataset.year));
+      }
+      updateProximityHover(event.clientX, event.clientY);
+    });
+
+    page.addEventListener('pointerleave', () => {
+      clearProximityHover();
+    });
+
+    infoButton.addEventListener('click', () => {
+      const open = infoPanel.classList.toggle('is-open');
+      infoButton.setAttribute('aria-expanded', String(open));
+    });
+
+    document.querySelector('.close-reader').addEventListener('click', closeReader);
+    reader.addEventListener('click', (event) => {
+      if (event.target === reader) closeReader();
+    });
+
+    document.querySelector('.reader-arrow.prev').addEventListener('click', () => {
+      prevSpread();
+    });
+
+    document.querySelector('.reader-arrow.next').addEventListener('click', () => {
+      nextSpread();
+    });
+
+    document.querySelector('.reader-shell').addEventListener('pointerdown', (event) => {
+      swipeStartX = event.clientX;
+      swipeStartY = event.clientY;
+    });
+
+    document.querySelector('.reader-shell').addEventListener('pointerup', (event) => {
+      const dx = event.clientX - swipeStartX;
+      const dy = event.clientY - swipeStartY;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      if (dx < 0) nextSpread();
+      if (dx > 0) prevSpread();
+    });
+
+    document.querySelector('.spread-page.right').addEventListener('click', () => {
+      nextSpread();
+    });
+
+    document.querySelector('.spread-page.left').addEventListener('click', () => {
+      prevSpread();
+    });
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeReader();
+      if (reader.classList.contains('is-open') && event.key === 'ArrowRight') nextSpread();
+      if (reader.classList.contains('is-open') && event.key === 'ArrowLeft') prevSpread();
+      if (!reader.classList.contains('is-open') && (event.key === 'ArrowDown' || event.key === 'ArrowRight')) step(0.8);
+      if (!reader.classList.contains('is-open') && (event.key === 'ArrowUp' || event.key === 'ArrowLeft')) step(-0.8);
+    });
+
+    render();
+  </script>
+</body>
+</html>

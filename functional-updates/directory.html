@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Directory | BCIS Alumni Network</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#A42D2D;
+  --accent-hover:#8B2424;
+  --accent-light:#FEF2F2;
+  --accent-subtle:rgba(164,45,45,0.08);
+  --text-1:#1A1714;
+  --text-2:#5C5550;
+  --text-3:#8A847E;
+  --text-4:#B5AFA9;
+  --bg:#FFFDFB;
+  --bg-alt:#F7F4F1;
+  --bg-warm:#F0EAE4;
+  --card:#FFFEFB;
+  --border:#E8E3DE;
+  --border-light:#F0ECE8;
+  --shadow-sm:0 1px 3px rgba(26,23,20,0.04),0 1px 2px rgba(26,23,20,0.03);
+  --shadow-md:0 4px 12px rgba(26,23,20,0.06),0 2px 4px rgba(26,23,20,0.04);
+  --shadow-lg:0 8px 24px rgba(26,23,20,0.08),0 4px 8px rgba(26,23,20,0.04);
+  --radius:10px;
+  --radius-lg:14px;
+  --ease:cubic-bezier(0.25,1,0.5,1);
+  --ease-expo:cubic-bezier(0.16,1,0.3,1);
+  --nav-h:56px;
+  --toolbar-h:52px;
+  --header-h:calc(var(--nav-h) + var(--toolbar-h));
+}
+html{scroll-behavior:smooth}
+body{font-family:'Gotham','Gotham SSm',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,253,251,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);padding:0 clamp(20px,4vw,48px)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:var(--nav-h);gap:32px}
+.nav-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-1);text-decoration:none;white-space:nowrap}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent-light);margin-left:8px;flex-shrink:0}
+
+/* HERO */
+.hero{padding:clamp(36px,5vw,64px) clamp(20px,4vw,48px) clamp(24px,3vw,36px);background:var(--bg)}
+.hero-inner{max-width:1200px;margin:0 auto}
+.hero-label{font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.hero-label::before{content:'';width:24px;height:2px;background:var(--accent);display:block}
+.hero h1{font-size:clamp(32px,4.5vw,52px);font-weight:700;color:var(--text-1);line-height:1.1;margin-bottom:12px;letter-spacing:-0.02em;text-wrap:balance}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-desc{font-size:clamp(14px,1.3vw,16px);color:var(--text-2);max-width:480px;line-height:1.6}
+
+/* TOOLBAR */
+.toolbar{position:sticky;top:var(--nav-h);z-index:90;background:rgba(255,253,251,0.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border-light);padding:0 clamp(20px,4vw,48px)}
+.toolbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:var(--toolbar-h);gap:10px}
+.search-wrap{position:relative;width:240px;flex-shrink:0}
+.search-input{width:100%;height:36px;border:1.5px solid var(--border);border-radius:999px;background:var(--card);padding:0 32px 0 36px;font-family:inherit;font-size:13px;color:var(--text-1);transition:border-color 0.2s,box-shadow 0.2s,width 0.3s var(--ease);outline:none}
+.search-input::placeholder{color:var(--text-4)}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-subtle);width:280px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-4);pointer-events:none}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:20px;height:20px;border:none;background:var(--bg-alt);border-radius:50%;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--text-3);font-size:12px;transition:background 0.15s}
+.search-clear.show{display:flex}
+.search-clear:hover{background:var(--border)}
+.toolbar-sep{width:1px;height:24px;background:var(--border);margin:0 4px;flex-shrink:0}
+.filter-group{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.filter-group::-webkit-scrollbar{display:none}
+
+/* FILTER DROPDOWNS */
+.filter-dropdown{position:relative}
+.filter-chip{height:32px;padding:0 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.filter-chip:hover{border-color:var(--text-4);color:var(--text-1)}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-light)}
+.filter-chip.active:hover{background:var(--accent-hover)}
+.filter-chip svg{width:12px;height:12px;transition:transform 0.2s}
+.filter-chip.open svg{transform:rotate(180deg)}
+.filter-menu{position:fixed;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 30px rgba(26,23,20,0.14),0 2px 8px rgba(26,23,20,0.08);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity 0.2s,transform 0.2s var(--ease),visibility 0.2s;z-index:200;max-height:260px;overflow-y:auto;padding:4px 0;scrollbar-width:thin}
+.filter-menu.open{opacity:1;visibility:visible;transform:translateY(0)}
+.filter-option{display:block;width:100%;padding:8px 14px;border:none;background:none;text-align:left;font-family:inherit;font-size:13px;color:var(--text-2);cursor:pointer;transition:background 0.12s,color 0.12s}
+.filter-option:hover{background:var(--bg-alt);color:var(--text-1)}
+.filter-option.selected{color:var(--accent);font-weight:600}
+.clear-btn{height:32px;padding:0 12px;border-radius:999px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:500;color:var(--accent);cursor:pointer;transition:background 0.15s,opacity 0.2s;white-space:nowrap;display:none;align-items:center;gap:4px}
+.clear-btn.show{display:inline-flex}
+.clear-btn:hover{background:var(--accent-subtle)}
+.toolbar-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+.result-count{font-size:12px;color:var(--text-3);white-space:nowrap}
+.map-toggle{height:34px;padding:0 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.25s var(--ease);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.map-toggle:hover{border-color:var(--text-4);color:var(--text-1)}
+.map-toggle.active{background:var(--accent);border-color:var(--accent);color:var(--accent-light)}
+.map-toggle.active:hover{background:var(--accent-hover)}
+.map-toggle svg{transition:transform 0.3s var(--ease)}
+
+/* MAIN LAYOUT */
+.directory-main{display:grid;grid-template-columns:1fr 1.5fr;gap:0;padding:0 clamp(20px,4vw,48px);max-width:calc(1200px + clamp(40px,8vw,96px));margin:0 auto;transition:grid-template-columns 0.4s var(--ease)}
+.directory-main.map-hidden{grid-template-columns:1fr 0fr}
+.alumni-list-wrapper{padding:20px 0 64px;min-width:0}
+.alumni-grid{display:grid;gap:12px;transition:opacity 0.18s}
+.directory-main:not(.map-hidden) .alumni-grid{grid-template-columns:1fr}
+.directory-main.map-hidden .alumni-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.alumni-grid.fading{opacity:0}
+
+/* MAP PANEL */
+.map-panel{position:sticky;top:var(--header-h);height:calc(100vh - var(--header-h));overflow:hidden;border-left:1px solid var(--border-light);transition:opacity 0.3s;z-index:1}
+.map-hidden .map-panel{opacity:0;pointer-events:none;border-left:none}
+#map{width:100%;height:100%;background:var(--bg-alt)}
+.leaflet-tile-pane{filter:saturate(0.3) sepia(0.08) brightness(1.02)}
+.leaflet-control-zoom{border:none !important;box-shadow:var(--shadow-md) !important;border-radius:var(--radius) !important;overflow:hidden}
+.leaflet-control-zoom a{width:32px !important;height:32px !important;line-height:32px !important;font-size:16px !important;color:var(--text-2) !important;border:none !important;background:var(--card) !important}
+.leaflet-control-zoom a:hover{background:var(--bg-alt) !important;color:var(--text-1) !important}
+.leaflet-control-attribution{font-size:9px !important;background:rgba(255,253,251,0.7) !important;backdrop-filter:blur(4px) !important;padding:2px 6px !important}
+
+/* MARKER CLUSTERS */
+.marker-cluster{background:none !important}
+.marker-cluster div{width:36px;height:36px;margin:3px;border-radius:50%;background:var(--accent);color:var(--accent-light);font-family:'Gotham','Gotham SSm',system-ui,sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(164,45,45,0.3),0 0 0 4px rgba(164,45,45,0.12)}
+.marker-cluster-small div{width:32px;height:32px;font-size:11px}
+.marker-cluster-large div{width:42px;height:42px;font-size:13px;box-shadow:0 2px 12px rgba(164,45,45,0.35),0 0 0 6px rgba(164,45,45,0.12)}
+
+/* CUSTOM MARKERS */
+.alumni-pin{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2.5px solid var(--card);box-shadow:0 1px 4px rgba(26,23,20,0.2);transition:transform 0.25s var(--ease),box-shadow 0.25s}
+.alumni-pin:hover,.alumni-pin.highlighted{transform:scale(1.4);box-shadow:0 2px 8px rgba(164,45,45,0.35);z-index:1000 !important}
+.alumni-pin.highlighted{animation:pin-pulse 0.6s var(--ease)}
+@keyframes pin-pulse{0%{transform:scale(1)}40%{transform:scale(1.8)}100%{transform:scale(1.4)}}
+
+/* MAP TOOLTIP */
+.map-tooltip{font-family:'Gotham','Gotham SSm',system-ui,sans-serif !important;font-size:12px !important;padding:6px 10px !important;border-radius:8px !important;border:1px solid var(--border) !important;box-shadow:var(--shadow-md) !important;color:var(--text-1) !important;background:var(--card) !important}
+.map-tooltip .tooltip-name{font-weight:600;margin-bottom:1px}
+.map-tooltip .tooltip-meta{font-size:11px;color:var(--text-3)}
+.leaflet-tooltip-top:before,.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{display:none}
+
+/* ALUMNI CARDS */
+.alumni-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:transform 0.25s var(--ease),box-shadow 0.25s var(--ease),border-color 0.25s;display:flex;gap:14px;align-items:flex-start}
+.alumni-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--border)}
+.alumni-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.alumni-card.highlighted{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-subtle),var(--shadow-md)}
+.card-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--accent-light);flex-shrink:0;letter-spacing:0.02em}
+.card-info{flex:1;min-width:0}
+.card-name-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+.card-name{font-size:15px;font-weight:500;color:var(--text-1);letter-spacing:-0.01em;line-height:1.3}
+.mentor-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;background:var(--accent);color:var(--accent-light);font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;line-height:1;flex-shrink:0}
+.card-detail{font-size:12px;color:var(--text-3);line-height:1.5;display:flex;align-items:center;gap:4px}
+.card-detail svg{flex-shrink:0;color:var(--text-4)}
+.card-detail.location{color:var(--text-2);font-weight:500}
+.card-meta{font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.4}
+
+/* DETAIL PANEL */
+.detail-overlay{position:fixed;inset:0;z-index:200;pointer-events:none;visibility:hidden}
+.detail-overlay.open{pointer-events:auto;visibility:visible}
+.detail-backdrop{position:absolute;inset:0;background:rgba(26,23,20,0.2);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;transition:opacity 0.25s}
+.detail-overlay.open .detail-backdrop{opacity:1}
+.detail-panel{position:absolute;right:0;top:0;bottom:0;width:420px;max-width:100%;background:var(--card);border-left:1px solid var(--border);box-shadow:-8px 0 32px rgba(26,23,20,0.08);transform:translateX(100%);transition:transform 0.3s var(--ease-expo);overflow-y:auto;padding:32px 28px 48px}
+.detail-overlay.open .detail-panel{transform:translateX(0)}
+.detail-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border:none;background:var(--bg-alt);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-3);transition:background 0.15s,color 0.15s}
+.detail-close:hover{background:var(--border);color:var(--text-1)}
+.detail-avatar{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:var(--accent-light);margin-bottom:20px}
+.detail-name{font-size:22px;font-weight:700;color:var(--text-1);letter-spacing:-0.02em;margin-bottom:4px;line-height:1.2}
+.detail-mentor-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:var(--accent);color:var(--accent-light);font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:12px}
+.detail-field{font-size:14px;color:var(--text-2);line-height:1.6;display:flex;align-items:center;gap:6px}
+.detail-field svg{flex-shrink:0;color:var(--text-3)}
+.detail-field+.detail-field{margin-top:4px}
+.detail-bio{margin-top:20px;padding-top:20px;border-top:1px solid var(--border-light);font-size:14px;color:var(--text-2);line-height:1.65}
+.detail-actions{margin-top:24px;display:flex;gap:10px;flex-wrap:wrap}
+.detail-btn{height:40px;padding:0 20px;border-radius:var(--radius);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.detail-btn-primary{background:var(--accent);color:var(--accent-light);border:none}
+.detail-btn-primary:hover{background:var(--accent-hover)}
+.detail-btn-secondary{background:none;color:var(--text-2);border:1.5px solid var(--border)}
+.detail-btn-secondary:hover{border-color:var(--text-4);color:var(--text-1)}
+
+/* EMPTY STATE */
+.empty-state{grid-column:1/-1;text-align:center;padding:64px 20px}
+.empty-state svg{margin-bottom:12px;color:var(--text-4)}
+.empty-state p{font-size:14px;color:var(--text-3);line-height:1.6}
+.empty-state p strong{color:var(--text-2);font-weight:600}
+.empty-state button{margin-top:16px;height:36px;padding:0 18px;border-radius:999px;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.empty-state button:hover{background:var(--accent);color:var(--accent-light)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .directory-main{grid-template-columns:1fr 1.2fr}
+  .search-wrap{width:200px}
+  .search-input:focus{width:220px}
+}
+@media(max-width:768px){
+  .nav-links a:not(.active){display:none}
+  .hero h1{font-size:28px}
+  .toolbar-inner{flex-wrap:wrap;height:auto;padding:10px 0;gap:8px}
+  .search-wrap{width:100%;order:-1}
+  .search-input,.search-input:focus{width:100%}
+  .toolbar-sep{display:none}
+  .filter-group{width:100%;overflow-x:auto}
+  .toolbar-right{width:100%;justify-content:space-between}
+  .directory-main{grid-template-columns:1fr !important;padding:0 clamp(16px,4vw,48px)}
+  .directory-main:not(.map-hidden) .map-panel{position:relative;top:0;height:40vh;border-left:none;border-bottom:1px solid var(--border-light);order:-1}
+  .directory-main.map-hidden .alumni-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .detail-panel{width:100%}
+}
+@media(max-width:480px){
+  .alumni-grid{grid-template-columns:1fr !important}
+  .hero{padding:24px 16px 16px}
+  .filter-chip{height:30px;font-size:11px;padding:0 10px}
+}
+
+/* ANIMATIONS */
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.alumni-card{animation:cardIn 0.35s var(--ease) both}
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+/* REDUCED MOTION */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}
+  .directory-main{transition:none}
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Alumni Network</a>
+    <div class="nav-links">
+      <a href="#">Homepage</a>
+      <a href="#" class="active">Directory</a>
+      <a href="mock.html">Mentor</a>
+    </div>
+    <div class="nav-avatar">RW</div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">/02 DIRECTORY</div>
+    <h1>Find your people, <em>everywhere</em></h1>
+    <p class="hero-desc">Explore where BCISers have landed. Search by name, filter by class, or pan the map to discover alumni across the globe.</p>
+  </div>
+</section>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search-wrap">
+      <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input class="search-input" id="searchInput" type="text" placeholder="Name, university, or major..." autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="filter-group" id="filterGroup">
+      <div class="filter-dropdown" data-filter="classYear">
+        <button class="filter-chip" aria-expanded="false">Class Year <svg viewBox="0 0 12 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l5 5 5-5"/></svg></button>
+        <div class="filter-menu" id="menu-classYear"></div>
+      </div>
+      <div class="filter-dropdown" data-filter="university">
+        <button class="filter-chip" aria-expanded="false">University <svg viewBox="0 0 12 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l5 5 5-5"/></svg></button>
+        <div class="filter-menu" id="menu-university"></div>
+      </div>
+      <div class="filter-dropdown" data-filter="major">
+        <button class="filter-chip" aria-expanded="false">Major <svg viewBox="0 0 12 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l5 5 5-5"/></svg></button>
+        <div class="filter-menu" id="menu-major"></div>
+      </div>
+      <button class="clear-btn" id="clearAll">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        Clear all
+      </button>
+    </div>
+    <div class="toolbar-right">
+      <span class="result-count" id="resultCount"></span>
+      <button class="map-toggle active" id="mapToggle" aria-pressed="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Map
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="directory-main" id="directoryMain">
+  <div class="alumni-list-wrapper">
+    <div class="alumni-grid" id="alumniGrid"></div>
+  </div>
+  <div class="map-panel" id="mapPanel">
+    <div id="map"></div>
+  </div>
+</div>
+
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-backdrop" id="detailBackdrop"></div>
+  <div class="detail-panel" id="detailPanel"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
+<script>
+const ALUMNI = [
+  {id:1,name:"Yuki Tanaka",initials:"YT",classYear:2022,city:"Beijing",country:"China",lat:39.904,lng:116.407,university:"Tsinghua University",major:"Computer Science",isMentor:true,bio:"Software engineer at ByteDance, focused on AI and education technology. Runs a weekend coding workshop for high schoolers."},
+  {id:2,name:"Leo Zhang",initials:"LZ",classYear:2023,city:"Beijing",country:"China",lat:39.920,lng:116.460,university:"Peking University",major:"Economics",isMentor:false,bio:"Economics graduate researcher with a focus on development economics in East Asia."},
+  {id:3,name:"Amy Chen",initials:"AC",classYear:2021,city:"Beijing",country:"China",lat:39.950,lng:116.350,university:"Central Academy of Fine Arts",major:"Graphic Design",isMentor:true,bio:"Visual identity designer for cultural institutions. Created branding for three major Beijing museums."},
+  {id:4,name:"Marcus Li",initials:"ML",classYear:2024,city:"Beijing",country:"China",lat:39.880,lng:116.420,university:"Beijing Film Academy",major:"Film Studies",isMentor:false,bio:"Film student exploring documentary storytelling across China's rural communities."},
+  {id:5,name:"Sophia Wang",initials:"SW",classYear:2020,city:"Beijing",country:"China",lat:39.930,lng:116.380,university:"Renmin University",major:"International Relations",isMentor:false,bio:"Policy analyst at an international development organization based in Chaoyang."},
+  {id:6,name:"David Kim",initials:"DK",classYear:2021,city:"Shanghai",country:"China",lat:31.230,lng:121.474,university:"Fudan University",major:"Business Administration",isMentor:true,bio:"Product manager at a fintech startup in Pudong. Previously interned at Alibaba and Tencent."},
+  {id:7,name:"Luna Ma",initials:"LM",classYear:2022,city:"Shanghai",country:"China",lat:31.240,lng:121.490,university:"NYU Shanghai",major:"Data Science",isMentor:false,bio:"Data scientist at a global consulting firm, specializing in consumer behavior analytics."},
+  {id:8,name:"Ryan Zhou",initials:"RZ",classYear:2019,city:"Shanghai",country:"China",lat:31.220,lng:121.460,university:"Shanghai Jiao Tong University",major:"Architecture",isMentor:false,bio:"Architect at an award-winning studio in the French Concession, working on adaptive reuse projects."},
+  {id:9,name:"Jenny Huang",initials:"JH",classYear:2022,city:"New York",country:"USA",lat:40.713,lng:-74.006,university:"Parsons School of Design",major:"Graphic Design",isMentor:true,bio:"Motion designer at a creative agency in Brooklyn. Three-time Adobe Design Achievement finalist."},
+  {id:10,name:"Alex Torres",initials:"AT",classYear:2020,city:"New York",country:"USA",lat:40.730,lng:-73.990,university:"Columbia University",major:"Film Studies",isMentor:true,bio:"Documentary filmmaker and Columbia MFA graduate. Recent short screened at Tribeca."},
+  {id:11,name:"Mia Park",initials:"MP",classYear:2023,city:"New York",country:"USA",lat:40.750,lng:-73.970,university:"NYU",major:"Psychology",isMentor:false,bio:"Graduate student in clinical psychology at NYU, researching cross-cultural identity in diaspora youth."},
+  {id:12,name:"Priya Nair",initials:"PN",classYear:2021,city:"London",country:"UK",lat:51.507,lng:-0.128,university:"UCL",major:"Architecture",isMentor:true,bio:"Architectural designer at a leading London practice. Won the RIBA Bronze Medal for student work."},
+  {id:13,name:"Oliver Chen",initials:"OC",classYear:2020,city:"London",country:"UK",lat:51.520,lng:-0.100,university:"LSE",major:"Economics",isMentor:false,bio:"Analyst at an investment bank in the City, covering Greater China equities."},
+  {id:14,name:"Sarah Liu",initials:"SL",classYear:2023,city:"Los Angeles",country:"USA",lat:34.052,lng:-118.244,university:"UCLA",major:"Media Studies",isMentor:false,bio:"Graduate student studying digital media and Asian American representation in entertainment."},
+  {id:15,name:"Kevin Wu",initials:"KW",classYear:2019,city:"Los Angeles",country:"USA",lat:34.070,lng:-118.260,university:"USC",major:"Film Studies",isMentor:true,bio:"Screenwriter and producer. His debut indie feature was acquired by A24 for distribution."},
+  {id:16,name:"Emma Zhang",initials:"EZ",classYear:2022,city:"Toronto",country:"Canada",lat:43.653,lng:-79.383,university:"University of Toronto",major:"Computer Science",isMentor:false,bio:"Software developer at a health tech company, building patient-facing mobile applications."},
+  {id:17,name:"Nathan Zhao",initials:"NZ",classYear:2021,city:"Toronto",country:"Canada",lat:43.660,lng:-79.390,university:"UBC",major:"Environmental Science",isMentor:false,bio:"Environmental consultant advising on urban sustainability projects in the Greater Toronto Area."},
+  {id:18,name:"Grace Lee",initials:"GL",classYear:2020,city:"Sydney",country:"Australia",lat:-33.869,lng:151.209,university:"University of Melbourne",major:"Art History",isMentor:false,bio:"Curator at a contemporary art gallery in Darlinghurst, specializing in Asia-Pacific artists."},
+  {id:19,name:"Haruki Sato",initials:"HS",classYear:2023,city:"Tokyo",country:"Japan",lat:35.676,lng:139.650,university:"Waseda University",major:"Business Administration",isMentor:false,bio:"Management trainee at a Japanese trading company, rotating through their energy and metals divisions."},
+  {id:20,name:"Chloe Xu",initials:"CX",classYear:2022,city:"Tokyo",country:"Japan",lat:35.690,lng:139.700,university:"University of Tokyo",major:"Data Science",isMentor:false,bio:"AI researcher working on natural language processing for low-resource languages."},
+  {id:21,name:"Daniel Tan",initials:"DT",classYear:2021,city:"Singapore",country:"Singapore",lat:1.352,lng:103.820,university:"NUS",major:"Business Administration",isMentor:true,bio:"Strategy consultant at a global firm's Asia-Pacific office, focused on consumer goods."},
+  {id:22,name:"Iris Feng",initials:"IF",classYear:2024,city:"Singapore",country:"Singapore",lat:1.360,lng:103.830,university:"NTU",major:"Environmental Science",isMentor:false,bio:"Research assistant studying coral reef conservation in Southeast Asia's marine reserves."},
+  {id:23,name:"Jason Lin",initials:"JL",classYear:2019,city:"San Francisco",country:"USA",lat:37.775,lng:-122.419,university:"Stanford University",major:"Computer Science",isMentor:true,bio:"Senior engineer at a climate tech startup in San Francisco, building carbon accounting tools."},
+  {id:24,name:"Vivian Chow",initials:"VC",classYear:2020,city:"Hong Kong",country:"China",lat:22.319,lng:114.169,university:"HKU",major:"International Relations",isMentor:false,bio:"Policy researcher at an Asia-focused think tank, specializing in cross-strait relations."},
+  {id:25,name:"Sophie Ren",initials:"SR",classYear:2018,city:"Berlin",country:"Germany",lat:52.520,lng:13.405,university:"UdK Berlin",major:"Graphic Design",isMentor:false,bio:"Brand designer at a Berlin studio, crafting identities for cultural and tech clients across Europe."}
+];
+
+const AVATAR_COLORS=['#A42D2D','#2D5A4A','#5A3D2D','#2D4A6A','#6A4A2D','#4A2D5A','#2D6A5A','#8A4A2D'];
+function avatarColor(id){return AVATAR_COLORS[(id-1)%AVATAR_COLORS.length]}
+
+const state={search:'',classYear:null,university:null,major:null,mapVisible:true,selectedId:null,highlightedId:null};
+
+const alumniGrid=document.getElementById('alumniGrid');
+const resultCount=document.getElementById('resultCount');
+const searchInput=document.getElementById('searchInput');
+const searchClear=document.getElementById('searchClear');
+const clearAllBtn=document.getElementById('clearAll');
+const mapToggleBtn=document.getElementById('mapToggle');
+const directoryMain=document.getElementById('directoryMain');
+const mapPanel=document.getElementById('mapPanel');
+const detailOverlay=document.getElementById('detailOverlay');
+const detailPanel=document.getElementById('detailPanel');
+const detailBackdrop=document.getElementById('detailBackdrop');
+
+let map,markerGroup,markers={};
+let searchTimeout,moveEndTimeout;
+
+function getUniqueValues(key){
+  const vals=[...new Set(ALUMNI.map(a=>a[key]))];
+  if(key==='classYear')return vals.sort((a,b)=>b-a);
+  return vals.sort();
+}
+
+function buildFilterMenus(){
+  const filters=[
+    {key:'classYear',label:v=>`Class of ${v}`},
+    {key:'university',label:v=>v},
+    {key:'major',label:v=>v}
+  ];
+  filters.forEach(f=>{
+    const menu=document.getElementById(`menu-${f.key}`);
+    const values=getUniqueValues(f.key);
+    menu.innerHTML=`<button class="filter-option" data-value="">All</button>`+
+      values.map(v=>`<button class="filter-option" data-value="${v}">${f.label(v)}</button>`).join('');
+  });
+}
+
+function getFilteredAlumni(){
+  let items=[...ALUMNI];
+  if(state.search){
+    const q=state.search.toLowerCase();
+    items=items.filter(a=>
+      a.name.toLowerCase().includes(q)||
+      a.university.toLowerCase().includes(q)||
+      a.major.toLowerCase().includes(q)
+    );
+  }
+  if(state.classYear)items=items.filter(a=>a.classYear===state.classYear);
+  if(state.university)items=items.filter(a=>a.university===state.university);
+  if(state.major)items=items.filter(a=>a.major===state.major);
+  return items;
+}
+
+function getVisibleAlumni(){
+  let items=getFilteredAlumni();
+  if(state.mapVisible&&map){
+    const bounds=map.getBounds();
+    items=items.filter(a=>bounds.contains([a.lat,a.lng]));
+  }
+  return items;
+}
+
+function hasActiveFilters(){
+  return state.search||state.classYear||state.university||state.major;
+}
+
+function updateClearButton(){
+  clearAllBtn.classList.toggle('show',hasActiveFilters());
+}
+
+function renderCard(a,i){
+  const highlighted=state.highlightedId===a.id?' highlighted':'';
+  return `
+    <div class="alumni-card${highlighted}" data-id="${a.id}" tabindex="0" style="animation-delay:${Math.min(i,12)*0.04}s">
+      <div class="card-avatar" style="background:${avatarColor(a.id)}">${a.initials}</div>
+      <div class="card-info">
+        <div class="card-name-row">
+          <span class="card-name">${a.name}</span>
+          ${a.isMentor?'<span class="mentor-badge">Mentor</span>':''}
+        </div>
+        <div class="card-detail" style="margin-bottom:2px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg>
+          <span class="location">${a.city}, ${a.country}</span>
+        </div>
+        <div class="card-detail">Class of ${a.classYear}</div>
+        <div class="card-meta">${a.university} · ${a.major}</div>
+      </div>
+    </div>`;
+}
+
+function renderList(){
+  alumniGrid.classList.add('fading');
+  setTimeout(()=>{
+    const visible=getVisibleAlumni();
+    const filtered=getFilteredAlumni();
+    if(visible.length===0){
+      const inViewport=state.mapVisible&&map;
+      const hasFilters=hasActiveFilters();
+      let msg,btnHtml='';
+      if(inViewport&&filtered.length>0){
+        msg='No alumni in this area.';
+        btnHtml='<button onclick="zoomToFitResults()">Zoom to fit results</button>';
+      }else if(hasFilters){
+        msg='No alumni match your filters.';
+        btnHtml='<button onclick="clearAllFilters()">Clear filters</button>';
+      }else{
+        msg='No alumni found.';
+      }
+      alumniGrid.innerHTML=`
+        <div class="empty-state">
+          <svg width="44" height="44" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="20" r="13"/><path d="M30 30l10 10"/></svg>
+          <p>${msg}</p>
+          ${btnHtml}
+        </div>`;
+    }else{
+      alumniGrid.innerHTML=visible.map((a,i)=>renderCard(a,i)).join('');
+    }
+    resultCount.textContent=`${visible.length} alumni`;
+    alumniGrid.classList.remove('fading');
+    attachCardListeners();
+  },180);
+}
+
+function attachCardListeners(){
+  document.querySelectorAll('.alumni-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const id=parseInt(card.dataset.id);
+      openDetail(id);
+    });
+    card.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){
+        e.preventDefault();
+        openDetail(parseInt(card.dataset.id));
+      }
+    });
+  });
+}
+
+function highlightCard(id){
+  state.highlightedId=id;
+  document.querySelectorAll('.alumni-card').forEach(c=>{
+    c.classList.toggle('highlighted',parseInt(c.dataset.id)===id);
+  });
+  const el=document.querySelector(`.alumni-card[data-id="${id}"]`);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>{
+    state.highlightedId=null;
+    document.querySelectorAll('.alumni-card.highlighted').forEach(c=>c.classList.remove('highlighted'));
+  },2000);
+}
+
+function openDetail(id){
+  const a=ALUMNI.find(x=>x.id===id);
+  if(!a)return;
+  state.selectedId=id;
+  detailPanel.innerHTML=`
+    <button class="detail-close" aria-label="Close" onclick="closeDetail()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+    <div class="detail-avatar" style="background:${avatarColor(a.id)}">${a.initials}</div>
+    <div class="detail-name">${a.name}</div>
+    ${a.isMentor?'<div class="detail-mentor-badge">Mentor</div>':''}
+    <div class="detail-field">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg>
+      ${a.city}, ${a.country}
+    </div>
+    <div class="detail-field">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Class of ${a.classYear}
+    </div>
+    <div class="detail-field">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg>
+      ${a.university}
+    </div>
+    <div class="detail-field">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      ${a.major}
+    </div>
+    <div class="detail-bio">${a.bio}</div>
+    <div class="detail-actions">
+      <button class="detail-btn detail-btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+        Connect
+      </button>
+      ${a.isMentor?`<button class="detail-btn detail-btn-secondary" onclick="closeDetail()">View in Mentor Hub</button>`:''}
+    </div>`;
+  detailOverlay.classList.add('open');
+  document.body.style.overflow='hidden';
+
+  if(state.mapVisible&&map){
+    map.flyTo([a.lat,a.lng],10,{duration:0.8});
+    highlightPin(a.id);
+  }
+}
+
+function closeDetail(){
+  detailOverlay.classList.remove('open');
+  document.body.style.overflow='';
+  state.selectedId=null;
+}
+
+/* MAP */
+function initMap(){
+  map=L.map('map',{zoomControl:true,attributionControl:true,maxZoom:16,minZoom:2});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains:'abcd',maxZoom:19
+  }).addTo(map);
+
+  map.zoomControl.setPosition('bottomright');
+
+  markerGroup=L.markerClusterGroup({
+    maxClusterRadius:45,
+    spiderfyOnMaxZoom:true,
+    showCoverageOnHover:false,
+    iconCreateFunction:function(cluster){
+      const count=cluster.getChildCount();
+      let size='small';
+      if(count>=10)size='medium';
+      if(count>=50)size='large';
+      return L.divIcon({html:'<div>'+count+'</div>',className:'marker-cluster marker-cluster-'+size,iconSize:L.point(42,42)});
+    }
+  });
+  map.addLayer(markerGroup);
+
+  map.on('moveend',()=>{
+    clearTimeout(moveEndTimeout);
+    moveEndTimeout=setTimeout(()=>{
+      renderList();
+    },150);
+  });
+
+  updateMapMarkers();
+
+  const visited=sessionStorage.getItem('directory-visited');
+  if(!visited){
+    map.setView([20,80],2,{animate:false});
+    setTimeout(()=>{
+      map.flyTo([35,105],3,{duration:1.2});
+      sessionStorage.setItem('directory-visited','true');
+    },400);
+  }else{
+    map.setView([35,105],3,{animate:false});
+  }
+}
+
+function updateMapMarkers(){
+  if(!map)return;
+  markerGroup.clearLayers();
+  markers={};
+  const filtered=getFilteredAlumni();
+  filtered.forEach(a=>{
+    const icon=L.divIcon({className:'',html:`<div class="alumni-pin" data-id="${a.id}"></div>`,iconSize:[14,14],iconAnchor:[7,7]});
+    const marker=L.marker([a.lat,a.lng],{icon:icon});
+    marker.bindTooltip(`<div class="tooltip-name">${a.name}</div><div class="tooltip-meta">Class of ${a.classYear} · ${a.city}</div>`,{direction:'top',offset:[0,-10],className:'map-tooltip'});
+    marker.on('click',()=>{
+      highlightCard(a.id);
+      highlightPin(a.id);
+    });
+    markers[a.id]=marker;
+    markerGroup.addLayer(marker);
+  });
+}
+
+function highlightPin(id){
+  Object.values(markers).forEach(m=>{
+    const el=m.getElement();
+    if(el){
+      const pin=el.querySelector('.alumni-pin');
+      if(pin)pin.classList.remove('highlighted');
+    }
+  });
+  if(markers[id]){
+    const el=markers[id].getElement();
+    if(el){
+      const pin=el.querySelector('.alumni-pin');
+      if(pin){pin.classList.add('highlighted');}
+    }
+  }
+}
+
+function zoomToFitResults(){
+  const filtered=getFilteredAlumni();
+  if(!filtered.length||!map)return;
+  const bounds=L.latLngBounds(filtered.map(a=>[a.lat,a.lng]));
+  map.flyToBounds(bounds,{padding:[50,50],maxZoom:12,duration:0.8});
+}
+
+/* MAP TOGGLE */
+function toggleMap(){
+  state.mapVisible=!state.mapVisible;
+  directoryMain.classList.toggle('map-hidden',!state.mapVisible);
+  mapToggleBtn.classList.toggle('active',state.mapVisible);
+  mapToggleBtn.setAttribute('aria-pressed',state.mapVisible);
+  if(state.mapVisible){
+    setTimeout(()=>{
+      if(map)map.invalidateSize();
+      renderList();
+    },420);
+  }else{
+    renderList();
+  }
+}
+
+/* FILTERS */
+function setFilter(key,value){
+  if(key==='classYear')state.classYear=value?parseInt(value):null;
+  else state[key]=value||null;
+  updateFilterChips();
+  updateClearButton();
+  updateMapMarkers();
+  renderList();
+  if(state.mapVisible&&map&&state.search){
+    map.flyTo([20,0],2,{duration:0.6});
+  }
+}
+
+function updateFilterChips(){
+  document.querySelectorAll('.filter-dropdown').forEach(dd=>{
+    const key=dd.dataset.filter;
+    const chip=dd.querySelector('.filter-chip');
+    const val=state[key];
+    const labels={classYear:'Class Year',university:'University',major:'Major'};
+    if(val){
+      chip.classList.add('active');
+      chip.childNodes[0].textContent=key==='classYear'?`Class of ${val}`:val;
+    }else{
+      chip.classList.remove('active');
+      chip.childNodes[0].textContent=labels[key]+' ';
+    }
+    dd.querySelectorAll('.filter-option').forEach(opt=>{
+      const optVal=opt.dataset.value;
+      opt.classList.toggle('selected',val?(optVal==String(val)):optVal==='');
+    });
+  });
+}
+
+function clearAllFilters(){
+  state.search='';
+  state.classYear=null;
+  state.university=null;
+  state.major=null;
+  searchInput.value='';
+  searchClear.classList.remove('show');
+  updateFilterChips();
+  updateClearButton();
+  updateMapMarkers();
+  if(state.mapVisible&&map){
+    map.flyTo([35,105],3,{duration:0.8});
+  }
+  renderList();
+}
+
+/* DROPDOWN LOGIC */
+let openMenu=null;
+function positionMenu(chip,menu){
+  const r=chip.getBoundingClientRect();
+  menu.style.top=(r.bottom+6)+'px';
+  menu.style.left=r.left+'px';
+}
+document.querySelectorAll('.filter-dropdown .filter-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    const dd=chip.closest('.filter-dropdown');
+    const menu=dd.querySelector('.filter-menu');
+    const wasOpen=menu.classList.contains('open');
+    closeAllMenus();
+    if(!wasOpen){
+      positionMenu(chip,menu);
+      menu.classList.add('open');
+      chip.classList.add('open');
+      chip.setAttribute('aria-expanded','true');
+      openMenu=dd;
+    }
+  });
+});
+
+document.querySelectorAll('.filter-menu').forEach(menu=>{
+  menu.addEventListener('click',e=>{
+    const opt=e.target.closest('.filter-option');
+    if(!opt)return;
+    const dd=menu.closest('.filter-dropdown');
+    const key=dd.dataset.filter;
+    setFilter(key,opt.dataset.value);
+    closeAllMenus();
+  });
+});
+
+function closeAllMenus(){
+  document.querySelectorAll('.filter-menu.open').forEach(m=>m.classList.remove('open'));
+  document.querySelectorAll('.filter-chip.open').forEach(c=>{c.classList.remove('open');c.setAttribute('aria-expanded','false');});
+  openMenu=null;
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.filter-dropdown')){closeAllMenus();}
+});
+
+/* SEARCH */
+searchInput.addEventListener('input',()=>{
+  clearTimeout(searchTimeout);
+  const val=searchInput.value;
+  searchClear.classList.toggle('show',val.length>0);
+  searchTimeout=setTimeout(()=>{
+    state.search=val;
+    updateClearButton();
+    updateMapMarkers();
+    if(state.mapVisible&&map&&val){
+      map.flyTo([20,0],2,{duration:0.6});
+    }
+    renderList();
+  },200);
+});
+searchClear.addEventListener('click',()=>{
+  searchInput.value='';
+  searchClear.classList.remove('show');
+  state.search='';
+  updateClearButton();
+  updateMapMarkers();
+  renderList();
+});
+
+/* CLEAR ALL */
+clearAllBtn.addEventListener('click',clearAllFilters);
+
+/* MAP TOGGLE */
+mapToggleBtn.addEventListener('click',toggleMap);
+
+/* DETAIL OVERLAY */
+detailBackdrop.addEventListener('click',closeDetail);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeDetail();
+    closeAllMenus();
+  }
+});
+
+/* INIT */
+buildFilterMenus();
+initMap();
+renderList();
+</script>
+</body>
+</html>

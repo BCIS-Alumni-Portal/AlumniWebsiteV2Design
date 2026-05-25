@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Alumni Pass | BCIS Alumni Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#A42D2D;
+  --accent-hover:#8B2424;
+  --accent-light:#FEF2F2;
+  --accent-subtle:#F5D5D5;
+  --text-1:#1A1714;
+  --text-2:#5C5550;
+  --text-3:#8A847E;
+  --text-4:#B5AFA9;
+  --bg:#FFFDFB;
+  --bg-alt:#F7F4F1;
+  --bg-warm:#F0EAE4;
+  --card:#FFFEFB;
+  --border:#E8E3DE;
+  --border-light:#F0ECE8;
+  --shadow-sm:0 1px 3px rgba(26,23,20,0.04),0 1px 2px rgba(26,23,20,0.03);
+  --shadow-md:0 4px 12px rgba(26,23,20,0.06),0 2px 4px rgba(26,23,20,0.04);
+  --shadow-lg:0 8px 24px rgba(26,23,20,0.08),0 4px 8px rgba(26,23,20,0.04);
+  --radius:10px;
+  --radius-lg:14px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Gotham','Gotham SSm',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,253,251,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);padding:0 clamp(20px,4vw,48px)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:56px;gap:32px}
+.nav-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-1);text-decoration:none;white-space:nowrap}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#FEF2F2;margin-left:8px;flex-shrink:0;cursor:pointer;position:relative;transition:box-shadow 0.2s}
+.nav-avatar:hover{box-shadow:0 0 0 3px rgba(164,45,45,0.15)}
+
+/* PAGE WRAPPER */
+.page-wrap{min-height:calc(100vh - 56px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px 60px;position:relative;overflow:hidden}
+
+/* GINKGO WATERMARK */
+.ginkgo-watermark{position:fixed;right:-60px;bottom:-40px;width:340px;height:340px;opacity:0.035;pointer-events:none;z-index:0}
+.ginkgo-watermark-small{position:absolute;width:120px;height:120px;opacity:0.06;pointer-events:none}
+
+/* WIZARD CONTAINER */
+.wizard{width:100%;max-width:640px;position:relative;z-index:1}
+
+/* PROGRESS BAR */
+.progress-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:36px;transition:opacity 0.4s var(--ease),transform 0.4s var(--ease)}
+.progress-bar.hidden{opacity:0;transform:translateY(-8px);pointer-events:none}
+.step-indicator{display:flex;align-items:center;gap:10px}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-4);transition:all 0.35s var(--ease);flex-shrink:0}
+.step-dot.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-dot.completed{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.step-label{font-size:13px;font-weight:600;color:var(--text-4);transition:color 0.3s;white-space:nowrap}
+.step-label.active{color:var(--text-1)}
+.step-label.completed{color:var(--accent)}
+.step-connector{width:40px;height:2px;background:var(--border);margin:0 8px;transition:background 0.35s var(--ease);flex-shrink:0}
+.step-connector.completed{background:var(--accent)}
+
+/* WIZARD CARD */
+.wizard-card{background:var(--card);border:1px solid var(--border-light);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;position:relative}
+
+/* SCREENS (age gate, steps, confirmation) */
+.screen{display:none;padding:36px 40px 40px;animation:screenIn 0.45s var(--ease) both}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION HEADERS */
+.section-title{font-size:20px;font-weight:700;color:var(--text-1);margin-bottom:6px;letter-spacing:-0.01em}
+.section-subtitle{font-size:14px;color:var(--text-3);margin-bottom:28px;line-height:1.5}
+
+/* FORM FIELDS */
+.field-group{margin-bottom:20px}
+.field-label{display:block;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
+.field-input{width:100%;height:44px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--card);padding:0 14px;font-family:inherit;font-size:14px;color:var(--text-1);transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(164,45,45,0.08)}
+.field-input.prefilled{background:var(--bg-alt);border-color:var(--border-light)}
+.field-hint{font-size:12px;color:var(--text-4);margin-top:4px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* SELECTABLE CARDS */
+.option-cards{display:grid;gap:12px;margin-top:8px}
+.option-card{border:2px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;cursor:pointer;transition:all 0.25s var(--ease);position:relative;background:var(--card)}
+.option-card:hover{border-color:var(--text-4);box-shadow:var(--shadow-sm)}
+.option-card.selected{border-color:var(--accent);background:var(--accent-light)}
+.option-card-radio{position:absolute;top:20px;right:20px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);transition:all 0.25s var(--ease);display:flex;align-items:center;justify-content:center}
+.option-card.selected .option-card-radio{border-color:var(--accent)}
+.option-card.selected .option-card-radio::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.option-card-title{font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:4px;padding-right:32px}
+.option-card-desc{font-size:13px;color:var(--text-2);line-height:1.5;padding-right:32px}
+
+/* REDIRECT MESSAGE */
+.redirect-msg{display:none;text-align:center;padding:28px 20px;animation:screenIn 0.4s var(--ease) both}
+.redirect-msg.show{display:block}
+.redirect-msg p{font-size:15px;color:var(--text-2);margin-bottom:20px;line-height:1.6}
+.redirect-msg .redirect-cta{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 24px;border-radius:var(--radius);background:var(--text-1);color:#fff;font-family:inherit;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:background 0.2s}
+.redirect-msg .redirect-cta:hover{background:var(--text-2)}
+
+/* AGE GATE */
+.age-gate-content{text-align:center;padding:20px 0}
+.age-gate-content .ginkgo-icon{margin-bottom:20px;color:var(--accent);opacity:0.25}
+.age-gate-question{font-size:18px;font-weight:700;color:var(--text-1);margin-bottom:28px}
+.age-buttons{display:flex;gap:12px;justify-content:center}
+.age-btn{height:48px;padding:0 36px;border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;border:2px solid var(--border)}
+.age-btn-yes{background:var(--accent);border-color:var(--accent);color:#fff}
+.age-btn-yes:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.age-btn-no{background:var(--card);color:var(--text-2)}
+.age-btn-no:hover{border-color:var(--text-4);color:var(--text-1)}
+
+/* UNDER 18 */
+.under18-content{text-align:center;padding:20px 0}
+.under18-content h2{font-size:20px;font-weight:700;color:var(--text-1);margin-bottom:12px}
+.under18-content p{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto}
+.under18-content .cta-group{display:flex;flex-direction:column;align-items:center;gap:12px}
+
+/* DOCUMENT PANELS */
+.doc-panel{border:1.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;transition:border-color 0.2s}
+.doc-panel.expanded{border-color:var(--accent-subtle)}
+.doc-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;transition:background 0.2s;user-select:none}
+.doc-header:hover{background:var(--bg-alt)}
+.doc-expand-icon{width:20px;height:20px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.3s var(--ease),background 0.3s}
+.doc-panel.expanded .doc-expand-icon{transform:rotate(180deg);background:var(--accent-light)}
+.doc-expand-icon svg{width:12px;height:12px;color:var(--text-3)}
+.doc-panel.expanded .doc-expand-icon svg{color:var(--accent)}
+.doc-title{font-size:14px;font-weight:600;color:var(--text-1);flex:1}
+.doc-status{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg-alt);color:var(--text-4);transition:all 0.3s}
+.doc-status.read{background:rgba(164,45,45,0.08);color:var(--accent)}
+.doc-body{max-height:0;overflow:hidden;transition:max-height 0.45s var(--ease)}
+.doc-panel.expanded .doc-body{max-height:600px}
+.doc-body-inner{padding:0 20px 20px;background:var(--bg-alt);border-top:1px solid var(--border-light);margin:0 1px}
+.doc-text{padding:20px 0;font-size:13px;color:var(--text-2);line-height:1.7;max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.doc-text::-webkit-scrollbar{width:4px}
+.doc-text::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.doc-text h4{font-size:14px;font-weight:700;color:var(--text-1);margin:16px 0 8px}
+.doc-text h4:first-child{margin-top:0}
+.doc-text p{margin-bottom:10px}
+.doc-text ul{margin:0 0 10px 20px}
+.doc-text li{margin-bottom:4px}
+
+/* SIGNATURE AREA */
+.sign-area{background:var(--bg-alt);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;margin-top:24px}
+.sign-area-title{font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:4px}
+.sign-area-desc{font-size:12px;color:var(--text-3);margin-bottom:20px;line-height:1.5}
+.sign-input-wrap{position:relative;margin-bottom:20px}
+.sign-input{width:100%;height:48px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--card);padding:0 14px;font-family:inherit;font-size:15px;color:var(--text-1);transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+.sign-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(164,45,45,0.08)}
+.sign-preview{min-height:72px;display:flex;align-items:flex-end;justify-content:space-between;padding:12px 0;border-bottom:1.5px solid var(--border);position:relative}
+.sign-preview-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-4);pointer-events:none;transition:opacity 0.3s}
+.sign-name{font-family:'Caveat',cursive;font-size:36px;font-weight:600;color:var(--text-1);line-height:1;transition:opacity 0.3s var(--ease)}
+.sign-date{font-size:12px;color:var(--text-3);flex-shrink:0;margin-left:16px}
+.sign-legal{font-size:11px;color:var(--text-4);line-height:1.5;margin-top:12px}
+.sign-watermark{font-size:10px;color:var(--text-4);margin-top:6px;opacity:0.7}
+
+/* PHOTO UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;position:relative;overflow:hidden}
+.upload-zone:hover{border-color:var(--accent-subtle);background:var(--accent-light)}
+.upload-zone.has-file{border-style:solid;border-color:var(--accent-subtle);background:var(--accent-light);padding:20px}
+.upload-zone .upload-icon{margin-bottom:12px;color:var(--text-4)}
+.upload-zone .upload-text{font-size:14px;color:var(--text-2);font-weight:500}
+.upload-zone .upload-hint{font-size:12px;color:var(--text-4);margin-top:4px}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* PHOTO PREVIEW AS PASS CARD */
+.pass-preview{display:none;background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);overflow:hidden;border:1px solid var(--border-light)}
+.pass-preview.show{display:block}
+.pass-preview-header{background:var(--accent);padding:14px 20px;display:flex;align-items:center;gap:10px}
+.pass-preview-header .pass-logo{font-size:12px;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.9);text-transform:uppercase}
+.pass-preview-body{padding:20px;display:flex;gap:20px;align-items:center}
+.pass-photo{width:88px;height:110px;border-radius:8px;background:var(--bg-alt);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pass-photo img{width:100%;height:100%;object-fit:cover}
+.pass-info{flex:1}
+.pass-name{font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:4px}
+.pass-detail{font-size:12px;color:var(--text-3);margin-bottom:2px}
+.pass-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);padding:3px 8px;border-radius:4px;margin-top:8px}
+
+/* PHOTO REQUIREMENTS */
+.photo-reqs{margin-top:20px}
+.photo-reqs-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);margin-bottom:10px}
+.photo-reqs ul{list-style:none;display:grid;gap:6px}
+.photo-reqs li{font-size:12px;color:var(--text-2);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.photo-reqs li::before{content:'';width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;transition:all 0.3s}
+.photo-reqs li.checked::before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--card)}
+
+/* REVIEW SUMMARY */
+.review-summary{margin-top:28px;border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.review-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-light);font-size:13px}
+.review-row:last-child{border-bottom:none}
+.review-label{color:var(--text-3);font-weight:500}
+.review-value{color:var(--text-1);font-weight:600;display:flex;align-items:center;gap:8px}
+.review-edit{font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;transition:opacity 0.2s;text-decoration:none}
+.review-edit:hover{opacity:0.7}
+.review-check{color:var(--accent)}
+
+/* BUTTONS */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:32px;gap:12px}
+.btn{height:46px;padding:0 28px;border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{background:var(--border);color:var(--text-4);cursor:not-allowed}
+.btn-secondary{background:none;color:var(--text-2);border:1.5px solid var(--border)}
+.btn-secondary:hover{border-color:var(--text-4);color:var(--text-1)}
+.btn-ghost{background:none;border:none;color:var(--text-3);font-weight:500}
+.btn-ghost:hover{color:var(--text-1)}
+.btn-submit{width:100%;height:50px;font-size:15px}
+
+/* CONFIRMATION */
+.confirm-content{text-align:center;padding:20px 0 8px}
+.confirm-ginkgo{margin-bottom:24px;animation:ginkgoFall 1.2s var(--ease) both}
+@keyframes ginkgoFall{
+  from{opacity:0;transform:translateY(-30px) rotate(-20deg) scale(0.7)}
+  60%{opacity:1;transform:translateY(4px) rotate(5deg) scale(1.02)}
+  to{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}
+}
+.confirm-content h2{font-size:24px;font-weight:700;color:var(--text-1);margin-bottom:8px;letter-spacing:-0.01em}
+.confirm-content p{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:28px;max-width:420px;margin-left:auto;margin-right:auto}
+.confirm-pass{max-width:320px;margin:0 auto 32px}
+.confirm-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .screen{padding:28px 24px 32px}
+  .field-row{grid-template-columns:1fr}
+  .progress-bar{gap:0}
+  .step-connector{width:24px;margin:0 4px}
+  .step-label{font-size:11px}
+  .age-buttons{flex-direction:column}
+  .age-btn{width:100%}
+  .sign-name{font-size:28px}
+  .pass-preview-body{flex-direction:column;align-items:center;text-align:center}
+  .confirm-actions{flex-direction:column}
+  .confirm-actions .btn{width:100%}
+  .btn-row{flex-direction:column-reverse}
+  .btn-row .btn{width:100%}
+}
+
+/* REDUCED MOTION */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Alumni Network</a>
+    <div class="nav-links">
+      <a href="#">Homepage</a>
+      <a href="#">Directory</a>
+      <a href="#">Mentor</a>
+    </div>
+    <div class="nav-avatar" title="Ruoyan Wang">RW</div>
+  </div>
+</nav>
+
+<!-- Ginkgo watermark -->
+<svg class="ginkgo-watermark" viewBox="0 0 100 130" fill="currentColor" style="color:var(--accent)">
+  <path d="M50 82 Q5 35 18 10 Q30 -2 50 8 Q70 -2 82 10 Q95 35 50 82Z"/>
+  <line x1="50" y1="80" x2="50" y2="125" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
+
+<main class="page-wrap">
+<div class="wizard">
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar" id="progressBar">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot1">1</div>
+      <span class="step-label active" id="label1">Verify</span>
+    </div>
+    <div class="step-connector" id="conn1"></div>
+    <div class="step-indicator">
+      <div class="step-dot" id="dot2">2</div>
+      <span class="step-label" id="label2">Sign</span>
+    </div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="step-indicator">
+      <div class="step-dot" id="dot3">3</div>
+      <span class="step-label" id="label3">Submit</span>
+    </div>
+  </div>
+
+  <div class="wizard-card">
+
+    <!-- SCREEN: AGE GATE -->
+    <div class="screen active" id="screenAge">
+      <div class="age-gate-content">
+        <svg class="ginkgo-icon" width="56" height="56" viewBox="0 0 100 120" fill="currentColor">
+          <path d="M50 82 Q5 35 18 10 Q30 -2 50 8 Q70 -2 82 10 Q95 35 50 82Z"/>
+          <line x1="50" y1="80" x2="50" y2="110" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <h2 class="section-title" style="text-align:center">BCIS Alumni Pass</h2>
+        <p class="section-subtitle" style="text-align:center;max-width:360px;margin:6px auto 32px">Before we begin, we need to confirm one thing.</p>
+        <p class="age-gate-question">Are you 18 years of age or older?</p>
+        <div class="age-buttons">
+          <button class="age-btn age-btn-yes" onclick="passAgeGate()">Yes, I am</button>
+          <button class="age-btn age-btn-no" onclick="failAgeGate()">No, not yet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: UNDER 18 -->
+    <div class="screen" id="screenUnder18">
+      <div class="under18-content">
+        <svg width="64" height="64" viewBox="0 0 100 120" fill="var(--accent)" style="opacity:0.2;margin-bottom:16px">
+          <path d="M100 180c0 0-10-50-50-90C30 60 20 30 50 15c20-10 40 5 50 25c10-20 30-35 50-25c30 15 20 45 0 75c-40 40-50 90-50 90z"/>
+          <line x1="100" y1="180" x2="100" y2="60" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        </svg>
+        <h2>We'd love to have you!</h2>
+        <p>The Alumni Pass is available once you turn 18. In the meantime, you can still visit campus for events, reunions, or to see your teachers.</p>
+        <div class="cta-group">
+          <button class="btn btn-primary" style="gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Book a Campus Visit
+          </button>
+          <button class="btn btn-ghost" onclick="location.href='#'">Back to Portal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: VERIFY & INTENT -->
+    <div class="screen" id="step1">
+      <h2 class="section-title">Your information</h2>
+      <p class="section-subtitle">Pulled from your profile. Edit if anything's changed.</p>
+
+      <div class="field-row" style="margin-bottom:20px">
+        <div class="field-group" style="margin:0">
+          <label class="field-label">Full Name</label>
+          <input class="field-input prefilled" id="fieldName" type="text" value="Ruoyan Wang">
+        </div>
+        <div class="field-group" style="margin:0">
+          <label class="field-label">Graduation Year</label>
+          <input class="field-input prefilled" id="fieldYear" type="text" value="2024">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input prefilled" id="fieldEmail" type="email" value="crystal013100@gmail.com">
+      </div>
+
+      <div style="margin-top:32px">
+        <h3 style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:6px">How will you use campus?</h3>
+        <p style="font-size:13px;color:var(--text-3);margin-bottom:16px">This determines the type of access you need.</p>
+        <div class="option-cards">
+          <div class="option-card" onclick="selectIntent(this,'regular')">
+            <div class="option-card-radio"></div>
+            <div class="option-card-title">I visit regularly</div>
+            <div class="option-card-desc">I'll use the alumni lounge, library, gym, or other facilities on a recurring basis.</div>
+          </div>
+          <div class="option-card" onclick="selectIntent(this,'occasional')">
+            <div class="option-card-radio"></div>
+            <div class="option-card-title">Just visiting</div>
+            <div class="option-card-desc">I come for events, reunions, or to see teachers occasionally.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="redirect-msg" id="redirectMsg">
+        <p>No pass needed for occasional visits!<br>You can book a one-time campus visit instead.</p>
+        <button class="redirect-cta">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Book a Campus Visit
+        </button>
+      </div>
+
+      <div class="btn-row" id="step1Buttons">
+        <span></span>
+        <button class="btn btn-primary" id="step1Next" disabled onclick="goToStep(2)">Continue
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: REVIEW & SIGN -->
+    <div class="screen" id="step2">
+      <h2 class="section-title">Review & sign</h2>
+      <p class="section-subtitle">Please review both documents, then sign below.</p>
+
+      <div class="doc-panel expanded" id="docPanel1" data-read="false">
+        <div class="doc-header" onclick="toggleDoc(this)">
+          <div class="doc-expand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <span class="doc-title">Alumni Pass Application Guidelines</span>
+          <span class="doc-status" id="docStatus1">Unread</span>
+        </div>
+        <div class="doc-body">
+          <div class="doc-body-inner">
+            <div class="doc-text" onscroll="markDocRead(1, this)">
+              <h4>1. Purpose</h4>
+              <p>The BCIS Alumni Pass grants returning graduates access to campus facilities including the alumni lounge, library, fitness center, and cafeteria during designated hours. This pass is intended for alumni who visit campus on a regular basis.</p>
+
+              <h4>2. Eligibility</h4>
+              <p>To be eligible for an Alumni Pass, applicants must:</p>
+              <ul>
+                <li>Be a graduate of Beijing City International School</li>
+                <li>Be 18 years of age or older at the time of application</li>
+                <li>Have completed the Alumni Registration Form</li>
+              </ul>
+
+              <h4>3. Terms of Use</h4>
+              <p>Pass holders agree to the following conditions:</p>
+              <ul>
+                <li>The pass is non-transferable and for personal use only</li>
+                <li>Campus access is limited to designated alumni hours (Monday through Friday, 8:00 AM to 6:00 PM; Saturday, 9:00 AM to 4:00 PM)</li>
+                <li>Pass holders must present their Alumni Pass at the front gate upon each visit</li>
+                <li>BCIS reserves the right to revoke pass privileges at any time</li>
+              </ul>
+
+              <h4>4. Renewal</h4>
+              <p>The Alumni Pass is valid for one calendar year from the date of issue and must be renewed annually through the Alumni Portal.</p>
+
+              <h4>5. Lost or Damaged Pass</h4>
+              <p>Report lost or damaged passes to the Alumni Relations Office. A replacement fee may apply. The original pass will be deactivated immediately upon report.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-panel" id="docPanel2" data-read="false">
+        <div class="doc-header" onclick="toggleDoc(this)">
+          <div class="doc-expand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <span class="doc-title">BCIS Code of Conduct</span>
+          <span class="doc-status" id="docStatus2">Unread</span>
+        </div>
+        <div class="doc-body">
+          <div class="doc-body-inner">
+            <div class="doc-text" onscroll="markDocRead(2, this)">
+              <h4>Community Standards</h4>
+              <p>The BCIS community is built on mutual respect, integrity, and responsibility. All members of the community, including alumni, are expected to uphold these values when on campus or representing the school.</p>
+
+              <h4>Child Protection</h4>
+              <p>BCIS operates under a comprehensive child protection framework. All adults on campus, including alumni pass holders, must:</p>
+              <ul>
+                <li>Avoid unsupervised contact with current students</li>
+                <li>Report any concerns about student welfare to school administration</li>
+                <li>Follow all visitor protocols in areas where students are present</li>
+                <li>Maintain appropriate boundaries at all times</li>
+              </ul>
+
+              <h4>Campus Behavior</h4>
+              <p>While on campus, alumni are expected to:</p>
+              <ul>
+                <li>Respect school property and shared spaces</li>
+                <li>Follow staff instructions regarding facility usage</li>
+                <li>Maintain a professional and respectful demeanor</li>
+                <li>Not bring unauthorized guests without prior approval</li>
+              </ul>
+
+              <h4>Violations</h4>
+              <p>Violations of this Code of Conduct may result in temporary or permanent revocation of alumni campus access privileges. Serious violations will be reported to the appropriate authorities.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sign-area">
+        <div class="sign-area-title">Sign both documents</div>
+        <div class="sign-area-desc">Type your full name below. Your electronic signature will be generated automatically.</div>
+        <div class="sign-input-wrap">
+          <input class="sign-input" id="signInput" type="text" placeholder="Type your full name" oninput="updateSignature()">
+        </div>
+        <div class="sign-preview">
+          <div class="sign-preview-empty" id="signEmpty">Your signature will appear here</div>
+          <span class="sign-name" id="signName" style="opacity:0"></span>
+          <span class="sign-date" id="signDate" style="opacity:0"></span>
+        </div>
+        <div class="sign-legal">By signing, you confirm you have read and agree to both the Alumni Pass Application Guidelines and the BCIS Code of Conduct.</div>
+        <div class="sign-watermark">Electronically signed via BCIS Alumni Portal</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goToStep(1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="step2Next" disabled onclick="goToStep(3)">Continue
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PHOTO & SUBMIT -->
+    <div class="screen" id="step3">
+      <h2 class="section-title">Photo & submit</h2>
+      <p class="section-subtitle">Upload a portrait photo for your Alumni Pass, then review and submit.</p>
+
+      <div class="upload-zone" id="uploadZone">
+        <svg class="upload-icon" width="40" height="40" viewBox="0 0 100 120" fill="currentColor" style="opacity:0.3">
+          <path d="M50 82 Q5 35 18 10 Q30 -2 50 8 Q70 -2 82 10 Q95 35 50 82Z"/>
+          <line x1="50" y1="80" x2="50" y2="110" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="upload-text">Click or drag to upload your photo</div>
+        <div class="upload-hint">JPG or PNG, max 10 MB</div>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png" onchange="handlePhotoUpload(this)">
+      </div>
+
+      <div class="pass-preview" id="passPreview">
+        <div class="pass-preview-header">
+          <svg width="20" height="20" viewBox="0 0 100 120" fill="rgba(255,255,255,0.8)">
+            <path d="M50 82 Q5 35 18 10 Q30 -2 50 8 Q70 -2 82 10 Q95 35 50 82Z"/>
+          </svg>
+          <span class="pass-logo">BCIS Alumni Pass</span>
+        </div>
+        <div class="pass-preview-body">
+          <div class="pass-photo">
+            <img id="passPhotoImg" src="" alt="Portrait">
+          </div>
+          <div class="pass-info">
+            <div class="pass-name" id="passName">Ruoyan Wang</div>
+            <div class="pass-detail" id="passEmail">crystal013100@gmail.com</div>
+            <div class="pass-detail" id="passYear">Class of 2024</div>
+            <div class="pass-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+              Verified Alumni
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 20px 14px;text-align:right">
+          <button class="btn btn-ghost" style="font-size:12px;height:auto;padding:4px 0" onclick="removePhoto()">Remove photo</button>
+        </div>
+      </div>
+
+      <div class="photo-reqs">
+        <div class="photo-reqs-title">Photo requirements</div>
+        <ul>
+          <li>A recent photo taken within the past six months</li>
+          <li>A standard headshot without head coverings</li>
+          <li>Well-lit, with your face fully visible</li>
+          <li>Clear features with a neutral expression</li>
+          <li>No Photoshop, filters, or visible retouching</li>
+        </ul>
+      </div>
+
+      <div class="review-summary">
+        <div class="review-row">
+          <span class="review-label">Name</span>
+          <span class="review-value"><span id="reviewName">Ruoyan Wang</span> <a class="review-edit" onclick="goToStep(1)">Edit</a></span>
+        </div>
+        <div class="review-row">
+          <span class="review-label">Email</span>
+          <span class="review-value"><span id="reviewEmail">crystal013100@gmail.com</span> <a class="review-edit" onclick="goToStep(1)">Edit</a></span>
+        </div>
+        <div class="review-row">
+          <span class="review-label">Graduation</span>
+          <span class="review-value"><span id="reviewYear">2024</span> <a class="review-edit" onclick="goToStep(1)">Edit</a></span>
+        </div>
+        <div class="review-row">
+          <span class="review-label">Documents</span>
+          <span class="review-value"><svg class="review-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Signed <span id="reviewSignDate" style="color:var(--text-4);font-weight:400;font-size:12px"></span></span>
+        </div>
+        <div class="review-row">
+          <span class="review-label">Photo</span>
+          <span class="review-value" id="reviewPhoto" style="color:var(--text-4);font-weight:400">Not uploaded</span>
+        </div>
+      </div>
+
+      <div class="btn-row" style="flex-direction:column;gap:12px;margin-top:28px">
+        <button class="btn btn-primary btn-submit" id="submitBtn" disabled onclick="submitApplication()">
+          Submit Application
+        </button>
+        <button class="btn btn-ghost" onclick="goToStep(2)" style="height:auto;padding:4px 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back to documents
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN: CONFIRMATION -->
+    <div class="screen" id="screenConfirm">
+      <div class="confirm-content">
+        <div class="confirm-ginkgo">
+          <svg width="64" height="64" viewBox="0 0 100 120" fill="var(--accent)">
+            <path d="M50 82 Q5 35 18 10 Q30 -2 50 8 Q70 -2 82 10 Q95 35 50 82Z"/>
+            <line x1="50" y1="85" x2="50" y2="110" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2>Application submitted</h2>
+        <p>We'll review your application and notify you at <strong id="confirmEmail">crystal013100@gmail.com</strong> once your Alumni Pass is ready. This usually takes 3-5 business days.</p>
+        <div class="confirm-pass" id="confirmPass"></div>
+        <div class="confirm-actions">
+          <button class="btn btn-primary" onclick="location.href='#'">Back to Portal</button>
+          <button class="btn btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Book a Campus Visit
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- wizard-card -->
+</div><!-- wizard -->
+</main>
+
+<script>
+// State
+let currentStep = 0; // 0 = age gate
+let selectedIntent = null;
+let signatureName = '';
+let photoUploaded = false;
+let photoDataUrl = null;
+let docsRead = [false, false];
+
+// Today's date
+const today = new Date();
+const dateStr = today.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+// Age gate
+function passAgeGate() {
+  showScreen('step1');
+  currentStep = 1;
+  updateProgressBar();
+  document.getElementById('progressBar').classList.remove('hidden');
+}
+
+function failAgeGate() {
+  showScreen('screenUnder18');
+  document.getElementById('progressBar').classList.add('hidden');
+}
+
+// Intent selection
+function selectIntent(card, intent) {
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedIntent = intent;
+
+  const redirectMsg = document.getElementById('redirectMsg');
+  const step1Buttons = document.getElementById('step1Buttons');
+  const step1Next = document.getElementById('step1Next');
+
+  if (intent === 'occasional') {
+    redirectMsg.classList.add('show');
+    step1Buttons.style.display = 'none';
+    document.getElementById('progressBar').classList.add('hidden');
+  } else {
+    redirectMsg.classList.remove('show');
+    step1Buttons.style.display = 'flex';
+    step1Next.disabled = false;
+    document.getElementById('progressBar').classList.remove('hidden');
+  }
+}
+
+// Document toggling
+function toggleDoc(header) {
+  const panel = header.closest('.doc-panel');
+  const wasExpanded = panel.classList.contains('expanded');
+  panel.classList.toggle('expanded');
+
+  // Mark as read when expanded
+  if (!wasExpanded) {
+    const idx = panel.id === 'docPanel1' ? 0 : 1;
+    setTimeout(() => markDocRead(idx + 1), 800);
+  }
+}
+
+function markDocRead(docNum, scrollEl) {
+  if (scrollEl) {
+    const threshold = scrollEl.scrollHeight - scrollEl.clientHeight - 20;
+    if (scrollEl.scrollTop < threshold) return;
+  }
+
+  docsRead[docNum - 1] = true;
+  const status = document.getElementById('docStatus' + docNum);
+  status.textContent = 'Read';
+  status.classList.add('read');
+  checkStep2Ready();
+}
+
+// Signature
+function updateSignature() {
+  const input = document.getElementById('signInput');
+  const nameEl = document.getElementById('signName');
+  const dateEl = document.getElementById('signDate');
+  const emptyEl = document.getElementById('signEmpty');
+
+  signatureName = input.value.trim();
+
+  if (signatureName) {
+    nameEl.textContent = signatureName;
+    nameEl.style.opacity = '1';
+    dateEl.textContent = dateStr;
+    dateEl.style.opacity = '1';
+    emptyEl.style.opacity = '0';
+  } else {
+    nameEl.style.opacity = '0';
+    dateEl.style.opacity = '0';
+    emptyEl.style.opacity = '1';
+  }
+
+  checkStep2Ready();
+}
+
+function checkStep2Ready() {
+  const ready = docsRead[0] && docsRead[1] && signatureName.length > 0;
+  document.getElementById('step2Next').disabled = !ready;
+}
+
+// Photo upload
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    photoDataUrl = e.target.result;
+    photoUploaded = true;
+
+    // Show pass preview
+    document.getElementById('passPhotoImg').src = photoDataUrl;
+    document.getElementById('passPreview').classList.add('show');
+    document.getElementById('uploadZone').style.display = 'none';
+
+    // Update review
+    document.getElementById('reviewPhoto').innerHTML = '<svg class="review-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg> Uploaded';
+    document.getElementById('reviewPhoto').style.color = 'var(--text-1)';
+    document.getElementById('reviewPhoto').style.fontWeight = '600';
+
+    // Check submit
+    checkSubmitReady();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  photoUploaded = false;
+  photoDataUrl = null;
+  document.getElementById('passPreview').classList.remove('show');
+  document.getElementById('uploadZone').style.display = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('reviewPhoto').innerHTML = 'Not uploaded';
+  document.getElementById('reviewPhoto').style.color = 'var(--text-4)';
+  document.getElementById('reviewPhoto').style.fontWeight = '400';
+  checkSubmitReady();
+}
+
+function checkSubmitReady() {
+  document.getElementById('submitBtn').disabled = !photoUploaded;
+}
+
+// Navigation
+function goToStep(step) {
+  currentStep = step;
+
+  // Update review data when going to step 3
+  if (step === 3) {
+    const name = document.getElementById('fieldName').value;
+    const email = document.getElementById('fieldEmail').value;
+    const year = document.getElementById('fieldYear').value;
+
+    document.getElementById('reviewName').textContent = name;
+    document.getElementById('reviewEmail').textContent = email;
+    document.getElementById('reviewYear').textContent = year;
+    document.getElementById('passName').textContent = name;
+    document.getElementById('passEmail').textContent = email;
+    document.getElementById('passYear').textContent = 'Class of ' + year;
+    document.getElementById('reviewSignDate').textContent = dateStr;
+  }
+
+  showScreen('step' + step);
+  updateProgressBar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgressBar() {
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('dot' + i);
+    const label = document.getElementById('label' + i);
+
+    dot.classList.remove('active', 'completed');
+    label.classList.remove('active', 'completed');
+
+    if (i < currentStep) {
+      dot.classList.add('completed');
+      dot.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>';
+      label.classList.add('completed');
+    } else if (i === currentStep) {
+      dot.classList.add('active');
+      dot.textContent = i;
+      label.classList.add('active');
+    } else {
+      dot.textContent = i;
+    }
+  }
+
+  document.getElementById('conn1').classList.toggle('completed', currentStep > 1);
+  document.getElementById('conn2').classList.toggle('completed', currentStep > 2);
+}
+
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+  // Force reflow for animation
+  const screen = document.getElementById(screenId);
+  screen.style.animation = 'none';
+  screen.offsetHeight; // trigger reflow
+  screen.style.animation = '';
+  screen.classList.add('active');
+}
+
+// Submit
+function submitApplication() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="50" stroke-linecap="round"/></svg> Submitting...';
+
+  // Add spin keyframe
+  if (!document.getElementById('spinStyle')) {
+    const style = document.createElement('style');
+    style.id = 'spinStyle';
+    style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+  }
+
+  setTimeout(() => {
+    // Update confirmation
+    document.getElementById('confirmEmail').textContent = document.getElementById('fieldEmail').value;
+
+    // Build pass preview for confirmation
+    const name = document.getElementById('fieldName').value;
+    const year = document.getElementById('fieldYear').value;
+    const confirmPassEl = document.getElementById('confirmPass');
+    confirmPassEl.innerHTML = `
+      <div class="pass-preview show" style="display:block">
+        <div class="pass-preview-header">
+          <svg width="20" height="20" viewBox="0 0 100 120" fill="rgba(255,255,255,0.8)">
+            <path d="M50 82 Q5 35 18 10 Q30 -2 50 8 Q70 -2 82 10 Q95 35 50 82Z"/>
+          </svg>
+          <span class="pass-logo">BCIS Alumni Pass</span>
+        </div>
+        <div class="pass-preview-body">
+          <div class="pass-photo">${photoDataUrl ? '<img src="'+photoDataUrl+'" alt="Portrait">' : ''}</div>
+          <div class="pass-info">
+            <div class="pass-name">${name}</div>
+            <div class="pass-detail">${document.getElementById('fieldEmail').value}</div>
+            <div class="pass-detail">Class of ${year}</div>
+            <div class="pass-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+              Verified Alumni
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    // Hide progress bar and show confirmation
+    document.getElementById('progressBar').classList.add('hidden');
+    showScreen('screenConfirm');
+
+  }, 1500);
+}
+
+// Pre-fill signature from name
+document.addEventListener('DOMContentLoaded', () => {
+  // Hide progress bar initially (age gate)
+  document.getElementById('progressBar').classList.add('hidden');
+});
+</script>
+
+</body>
+</html>
