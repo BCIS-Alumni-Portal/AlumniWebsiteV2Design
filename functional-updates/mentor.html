@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor Hub | BCIS Alumni Network</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#A42D2D;
+  --accent-hover:#8B2424;
+  --accent-light:#FEF2F2;
+  --accent-subtle:#F5D5D5;
+  --text-1:#1A1714;
+  --text-2:#5C5550;
+  --text-3:#8A847E;
+  --text-4:#B5AFA9;
+  --bg:#FFFDFB;
+  --bg-alt:#F7F4F1;
+  --bg-warm:#F0EAE4;
+  --card:#FFFEFB;
+  --border:#E8E3DE;
+  --border-light:#F0ECE8;
+  --shadow-sm:0 1px 3px rgba(26,23,20,0.04),0 1px 2px rgba(26,23,20,0.03);
+  --shadow-md:0 4px 12px rgba(26,23,20,0.06),0 2px 4px rgba(26,23,20,0.04);
+  --shadow-lg:0 8px 24px rgba(26,23,20,0.08),0 4px 8px rgba(26,23,20,0.04);
+  --radius:10px;
+  --radius-lg:14px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Gotham','Gotham SSm',system-ui,sans-serif;background:var(--bg);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.5}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,253,251,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);padding:0 clamp(20px,4vw,48px)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:56px;gap:32px}
+.nav-logo{font-family:'Figtree',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-1);text-decoration:none;white-space:nowrap}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#FEF2F2;margin-left:8px;flex-shrink:0}
+
+/* HERO */
+.hero{padding:clamp(40px,6vw,72px) clamp(20px,4vw,48px) clamp(32px,4vw,48px);background:var(--bg)}
+.hero-inner{max-width:1200px;margin:0 auto}
+.hero-label{font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.hero-label::before{content:'';width:24px;height:2px;background:var(--accent);display:block}
+.hero h1{font-family:'Gotham','Gotham SSm',system-ui,sans-serif;font-size:clamp(36px,5vw,56px);font-weight:700;color:var(--text-1);line-height:1.1;margin-bottom:16px;letter-spacing:-0.02em}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-desc{font-size:clamp(15px,1.4vw,17px);color:var(--text-2);max-width:520px;line-height:1.6;margin-bottom:28px}
+.search-wrap{position:relative;max-width:520px}
+.search-input{width:100%;height:48px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--card);padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:var(--text-1);transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+.search-input::placeholder{color:var(--text-4)}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(164,45,45,0.08)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-4);pointer-events:none}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border:none;background:var(--bg-alt);border-radius:50%;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--text-3);font-size:14px;transition:background 0.15s}
+.search-clear.show{display:flex}
+.search-clear:hover{background:var(--border)}
+
+/* TABS */
+.tab-bar{border-bottom:1px solid var(--border);padding:0 clamp(20px,4vw,48px);background:var(--bg)}
+.tab-bar-inner{max-width:1200px;margin:0 auto;display:flex;gap:0}
+.tab-btn{padding:14px 20px;font-family:inherit;font-size:14px;font-weight:600;color:var(--text-3);border:none;background:none;cursor:pointer;position:relative;transition:color 0.2s}
+.tab-btn::after{content:'';position:absolute;bottom:-1px;left:20px;right:20px;height:2px;background:var(--accent);border-radius:1px;transform:scaleX(0);transition:transform 0.3s var(--ease)}
+.tab-btn:hover{color:var(--text-1)}
+.tab-btn.active{color:var(--accent)}
+.tab-btn.active::after{transform:scaleX(1)}
+
+/* FILTER BAR */
+.filter-bar{padding:20px clamp(20px,4vw,48px) 0;background:var(--bg)}
+.filter-inner{max-width:1200px;margin:0 auto}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{height:34px;padding:0 16px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.chip:hover{border-color:var(--text-4);color:var(--text-1)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#FEF2F2}
+.filter-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.format-pills{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.format-pill{height:30px;padding:0 14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px}
+.format-pill:hover{border-color:var(--text-4);color:var(--text-1)}
+.format-pill.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.sort-select{height:30px;padding:0 28px 0 12px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--card) url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A847E' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center;font-family:inherit;font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;transition:border-color 0.2s}
+.sort-select:focus{border-color:var(--accent)}
+.result-count{font-size:12px;color:var(--text-3);margin-left:auto;white-space:nowrap}
+
+/* CONTENT GRID */
+.content-section{padding:24px clamp(20px,4vw,48px) 48px;background:var(--bg)}
+.content-inner{max-width:1200px;margin:0 auto}
+.content-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;transition:opacity 0.2s}
+.content-grid.fading{opacity:0}
+.empty-state{grid-column:1/-1;text-align:center;padding:64px 20px}
+.empty-state svg{margin-bottom:16px;color:var(--text-4)}
+.empty-state p{font-size:15px;color:var(--text-3)}
+.empty-state p strong{color:var(--text-2);font-weight:600}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform 0.3s var(--ease),box-shadow 0.3s var(--ease),border-color 0.3s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--border)}
+.card-thumb{aspect-ratio:16/10;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-thumb.type-recording{background:linear-gradient(145deg,#2A1F1F,#3D2828)}
+.card-thumb.type-article{background:var(--bg-alt)}
+.card-thumb.type-session{background:var(--bg-warm)}
+.card-thumb .play-circle{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;transition:transform 0.3s var(--ease),background 0.3s}
+.card:hover .play-circle{transform:scale(1.1);background:rgba(255,255,255,0.25)}
+.card-thumb .thumb-icon{color:var(--text-4);opacity:0.5}
+.card-thumb .duration{position:absolute;bottom:8px;right:8px;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);font-size:11px;font-weight:600;color:rgba(255,255,255,0.9);letter-spacing:0.02em}
+.card-body{padding:14px 16px 18px}
+.card-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px}
+.card-tag.tag-recording{color:var(--accent)}
+.card-tag.tag-article{color:var(--accent)}
+.card-tag.tag-session{color:var(--accent)}
+.card-tag .tag-dot{width:6px;height:6px;border-radius:50%}
+.tag-recording .tag-dot{background:var(--accent)}
+.tag-article .tag-dot{background:var(--text-3)}
+.tag-session .tag-dot{background:var(--bg-warm);border:1.5px solid var(--text-3)}
+.card-title{font-family:'Gotham','Gotham SSm',system-ui,sans-serif;font-size:15px;font-weight:500;line-height:1.35;color:var(--text-1);margin-bottom:8px;letter-spacing:-0.01em}
+.card-author{font-size:12px;color:var(--text-3);line-height:1.4}
+.card-author span{color:var(--text-2);font-weight:500}
+
+/* MENTORS */
+.mentor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.mentor-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:24px;cursor:pointer;transition:transform 0.3s var(--ease),box-shadow 0.3s var(--ease),border-color 0.3s;display:flex;gap:16px;align-items:flex-start}
+.mentor-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--border)}
+.mentor-avatar{width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#FEF2F2;flex-shrink:0;letter-spacing:0.02em}
+.mentor-body{flex:1;min-width:0}
+.mentor-name{font-family:'Gotham','Gotham SSm',system-ui,sans-serif;font-size:17px;font-weight:700;color:var(--text-1);margin-bottom:2px}
+.mentor-field{font-size:13px;font-weight:500;color:var(--accent);margin-bottom:4px}
+.mentor-year{font-size:12px;color:var(--text-3);margin-bottom:10px}
+.mentor-bio{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:12px}
+.mentor-stats{display:flex;gap:12px;flex-wrap:wrap}
+.mentor-stat{font-size:11px;font-weight:600;color:var(--text-3);background:var(--bg-alt);padding:4px 10px;border-radius:6px}
+.mentor-arrow{width:32px;height:32px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-4);transition:background 0.2s,color 0.2s;align-self:center}
+.mentor-card:hover .mentor-arrow{background:var(--accent-light);color:var(--accent)}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* FOOTER SPACER */
+.footer-space{height:80px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .nav-links a:not(.active){display:none}
+  .hero h1{font-size:32px}
+  .content-grid{grid-template-columns:1fr 1fr;gap:14px}
+  .mentor-grid{grid-template-columns:1fr}
+  .filter-meta{flex-direction:column;align-items:flex-start;gap:10px}
+  .result-count{margin-left:0}
+}
+@media(max-width:480px){
+  .content-grid{grid-template-columns:1fr}
+  .chip-row{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
+  .chip-row::-webkit-scrollbar{display:none}
+  .format-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .format-pills::-webkit-scrollbar{display:none}
+}
+
+/* STAGGER ANIMATION */
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.card,.mentor-card{animation:cardIn 0.4s var(--ease) both}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Alumni Network</a>
+    <div class="nav-links">
+      <a href="#">Homepage</a>
+      <a href="#">Directory</a>
+      <a href="#" class="active">Mentor</a>
+    </div>
+    <div class="nav-avatar">RW</div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">/01 MENTOR HUB</div>
+    <h1>Stories, insights<br>and <em>mentorship</em></h1>
+    <p class="hero-desc">Recordings, articles, and session notes shared by BCISers across graduating classes and disciplines.</p>
+    <div class="search-wrap">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" id="searchInput" type="text" placeholder="Search stories, mentors, or topics...">
+      <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+    </div>
+  </div>
+</section>
+
+<div class="tab-bar">
+  <div class="tab-bar-inner">
+    <button class="tab-btn active" data-tab="stories">Stories &amp; Insights</button>
+    <button class="tab-btn" data-tab="mentors">Mentors</button>
+  </div>
+</div>
+
+<!-- STORIES VIEW -->
+<div class="view active" id="view-stories">
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <div class="chip-row" id="topicChips">
+        <button class="chip active" data-topic="all">All topics</button>
+        <button class="chip" data-topic="career">Career</button>
+        <button class="chip" data-topic="portfolio">Portfolio</button>
+        <button class="chip" data-topic="industry">Industry</button>
+        <button class="chip" data-topic="creative">Creative</button>
+        <button class="chip" data-topic="freelancing">Freelancing</button>
+        <button class="chip" data-topic="gradschool">Grad School</button>
+      </div>
+      <div class="filter-meta">
+        <div class="format-pills" id="formatPills">
+          <button class="format-pill active" data-format="all">All formats</button>
+          <button class="format-pill" data-format="recording">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M2 1l7 4-7 4V1z"/></svg>
+            Recordings
+          </button>
+          <button class="format-pill" data-format="article">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="10" height="10" rx="1.5"/><line x1="3.5" y1="4" x2="8.5" y2="4"/><line x1="3.5" y1="6.5" x2="7" y2="6.5"/></svg>
+            Articles
+          </button>
+          <button class="format-pill" data-format="session">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><circle cx="6" cy="6" r="1.5"/></svg>
+            Sessions
+          </button>
+        </div>
+        <select class="sort-select" id="sortSelect">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="popular">Most popular</option>
+        </select>
+        <span class="result-count" id="resultCount"></span>
+      </div>
+    </div>
+  </div>
+
+  <section class="content-section">
+    <div class="content-inner">
+      <div class="content-grid" id="contentGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- MENTORS VIEW -->
+<div class="view" id="view-mentors">
+  <section class="content-section">
+    <div class="content-inner">
+      <div class="mentor-grid" id="mentorGrid"></div>
+    </div>
+  </section>
+</div>
+
+<div class="footer-space"></div>
+
+<script>
+const CONTENT = [
+  {
+    id:1,
+    title:"Breaking Into Motion Design Without a Traditional Portfolio",
+    author:"Jenny Huang",
+    classYear:"Class of 2022",
+    type:"recording",
+    topic:"career",
+    duration:"38 min",
+    date:new Date("2025-11-15"),
+    views:342
+  },
+  {
+    id:2,
+    title:"How I Cold-Emailed My Way to a Full-Time Studio Job",
+    author:"Marco Torres",
+    classYear:"Class of 2020",
+    type:"article",
+    topic:"career",
+    readTime:"7 min read",
+    date:new Date("2025-10-28"),
+    views:521
+  },
+  {
+    id:3,
+    title:"Negotiating Your First Offer: What They Don't Teach You",
+    author:"Sarah Liu",
+    classYear:"Class of 2023",
+    type:"recording",
+    topic:"career",
+    duration:"52 min",
+    date:new Date("2025-10-15"),
+    views:287
+  },
+  {
+    id:4,
+    title:"Portfolio Crit: UX Case Studies That Actually Land",
+    author:"David Kim",
+    classYear:"Class of 2021",
+    type:"recording",
+    topic:"portfolio",
+    duration:"24 min",
+    date:new Date("2025-09-20"),
+    views:198
+  },
+  {
+    id:5,
+    title:"Freelance Rate Setting 101: Know Your Worth",
+    author:"Amy Zhang",
+    classYear:"Class of 2022",
+    type:"session",
+    topic:"freelancing",
+    date:new Date("2025-09-05"),
+    views:156
+  },
+  {
+    id:6,
+    title:"The Gap Between School and Studio: What Nobody Told Me",
+    author:"Priya Nair",
+    classYear:"Class of 2021",
+    type:"article",
+    topic:"industry",
+    readTime:"5 min read",
+    date:new Date("2025-08-22"),
+    views:413
+  },
+  {
+    id:7,
+    title:"Building Your Network Before Graduation",
+    author:"Alex Wang",
+    classYear:"Class of 2023",
+    type:"article",
+    topic:"career",
+    readTime:"4 min read",
+    date:new Date("2025-08-10"),
+    views:289
+  },
+  {
+    id:8,
+    title:"From BCIS to the Ivy League: My Application Journey",
+    author:"Kevin Chen",
+    classYear:"Class of 2019",
+    type:"recording",
+    topic:"gradschool",
+    duration:"45 min",
+    date:new Date("2025-12-01"),
+    views:567
+  },
+  {
+    id:9,
+    title:"The Creative Process Behind Award-Winning Short Films",
+    author:"Luna Ma",
+    classYear:"Class of 2020",
+    type:"session",
+    topic:"creative",
+    date:new Date("2025-07-15"),
+    views:178
+  },
+  {
+    id:10,
+    title:"From Beijing to Berlin: My Design Career Journey",
+    author:"Sophie Ren",
+    classYear:"Class of 2018",
+    type:"article",
+    topic:"industry",
+    readTime:"8 min read",
+    date:new Date("2025-11-30"),
+    views:445
+  }
+];
+
+const MENTORS = [
+  {
+    name:"Jenny Huang",initials:"JH",field:"Motion Design",classYear:"Class of 2022",
+    bio:"Award-winning motion designer at a creative studio in Shanghai",
+    recordings:3,articles:1,sessions:0
+  },
+  {
+    name:"Marco Torres",initials:"MT",field:"Illustration",classYear:"Class of 2020",
+    bio:"Freelance illustrator working with editorial and tech clients globally",
+    recordings:1,articles:2,sessions:4
+  },
+  {
+    name:"Sarah Liu",initials:"SL",field:"Product Design",classYear:"Class of 2023",
+    bio:"Product designer at a leading tech company in Beijing",
+    recordings:2,articles:0,sessions:1
+  },
+  {
+    name:"Kevin Chen",initials:"KC",field:"Film Studies",classYear:"Class of 2019",
+    bio:"Documentary filmmaker, Columbia MFA graduate, Sundance selectee",
+    recordings:1,articles:1,sessions:0
+  },
+  {
+    name:"Priya Nair",initials:"PN",field:"Graphic Design",classYear:"Class of 2021",
+    bio:"Brand designer at a global design agency in London",
+    recordings:0,articles:2,sessions:1
+  }
+];
+
+const AVATAR_COLORS = ['#A42D2D','#2D4A6A','#4A6A2D','#6A4A2D','#4A2D6A'];
+
+let currentTopic = 'all';
+let currentFormat = 'all';
+let currentSort = 'newest';
+let currentSearch = '';
+let currentTab = 'stories';
+
+const grid = document.getElementById('contentGrid');
+const mentorGrid = document.getElementById('mentorGrid');
+const resultCount = document.getElementById('resultCount');
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const filterBar = document.querySelector('.filter-bar');
+const sortSelect = document.getElementById('sortSelect');
+
+function renderCard(item, i) {
+  const typeLabel = {recording:'Recording',article:'Article',session:'Session Notes'}[item.type];
+  const meta = item.duration || item.readTime || '';
+  let thumbContent = '';
+  if (item.type === 'recording') {
+    thumbContent = `
+      <div class="play-circle">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="#FFFDFB"><path d="M4 2l10 6-10 6V2z"/></svg>
+      </div>
+      ${item.duration ? `<span class="duration">${item.duration}</span>` : ''}`;
+  } else if (item.type === 'article') {
+    thumbContent = `<svg class="thumb-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="5" width="20" height="26" rx="2.5"/><line x1="12" y1="12" x2="24" y2="12"/><line x1="12" y1="16.5" x2="24" y2="16.5"/><line x1="12" y1="21" x2="20" y2="21"/></svg>`;
+  } else {
+    thumbContent = `<svg class="thumb-icon" width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="18" r="10"/><circle cx="18" cy="18" r="3.5"/><line x1="18" y1="8" x2="18" y2="11"/><line x1="18" y1="25" x2="18" y2="28"/></svg>`;
+  }
+  return `
+    <div class="card" style="animation-delay:${i * 0.06}s">
+      <div class="card-thumb type-${item.type}">${thumbContent}</div>
+      <div class="card-body">
+        <div class="card-tag tag-${item.type}"><span class="tag-dot"></span>${typeLabel}</div>
+        <div class="card-title">${item.title}</div>
+        <div class="card-author"><span>${item.author}</span> · ${item.classYear}${meta ? ' · ' + meta : ''}</div>
+      </div>
+    </div>`;
+}
+
+function getFiltered() {
+  let items = [...CONTENT];
+  if (currentTopic !== 'all') items = items.filter(i => i.topic === currentTopic);
+  if (currentFormat !== 'all') items = items.filter(i => i.type === currentFormat);
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    items = items.filter(i =>
+      i.title.toLowerCase().includes(q) ||
+      i.author.toLowerCase().includes(q) ||
+      i.topic.toLowerCase().includes(q) ||
+      i.type.toLowerCase().includes(q) ||
+      i.classYear.toLowerCase().includes(q)
+    );
+  }
+  if (currentSort === 'newest') items.sort((a, b) => b.date - a.date);
+  else if (currentSort === 'oldest') items.sort((a, b) => a.date - b.date);
+  else items.sort((a, b) => b.views - a.views);
+  return items;
+}
+
+function renderGrid() {
+  grid.classList.add('fading');
+  setTimeout(() => {
+    const items = getFiltered();
+    if (items.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="20" r="14"/><path d="M30 30l10 10"/></svg>
+          <p>No results found. <strong>Try a different filter or search term.</strong></p>
+        </div>`;
+    } else {
+      grid.innerHTML = items.map((item, i) => renderCard(item, i)).join('');
+    }
+    resultCount.textContent = `${items.length} result${items.length !== 1 ? 's' : ''}`;
+    grid.classList.remove('fading');
+  }, 180);
+}
+
+function renderMentors() {
+  const q = currentSearch.toLowerCase();
+  let mentors = MENTORS;
+  if (q) {
+    mentors = mentors.filter(m =>
+      m.name.toLowerCase().includes(q) ||
+      m.field.toLowerCase().includes(q) ||
+      m.classYear.toLowerCase().includes(q)
+    );
+  }
+  mentorGrid.innerHTML = mentors.map((m, i) => {
+    const stats = [];
+    if (m.recordings) stats.push(`${m.recordings} recording${m.recordings>1?'s':''}`);
+    if (m.articles) stats.push(`${m.articles} article${m.articles>1?'s':''}`);
+    if (m.sessions) stats.push(`${m.sessions} session${m.sessions>1?'s':''}`);
+    return `
+      <div class="mentor-card" style="animation-delay:${i * 0.08}s">
+        <div class="mentor-avatar" style="background:${AVATAR_COLORS[i % AVATAR_COLORS.length]}">${m.initials}</div>
+        <div class="mentor-body">
+          <div class="mentor-name">${m.name}</div>
+          <div class="mentor-field">${m.field}</div>
+          <div class="mentor-year">${m.classYear}</div>
+          <div class="mentor-bio">${m.bio}</div>
+          <div class="mentor-stats">${stats.map(s => `<span class="mentor-stat">${s}</span>`).join('')}</div>
+        </div>
+        <div class="mentor-arrow">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+        </div>
+      </div>`;
+  }).join('');
+  if (mentors.length === 0) {
+    mentorGrid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="20" r="14"/><path d="M30 30l10 10"/></svg>
+        <p>No mentors found matching your search.</p>
+      </div>`;
+  }
+}
+
+// Topic chips
+document.querySelectorAll('#topicChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#topicChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentTopic = chip.dataset.topic;
+    renderGrid();
+  });
+});
+
+// Format pills
+document.querySelectorAll('#formatPills .format-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#formatPills .format-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentFormat = pill.dataset.format;
+    renderGrid();
+  });
+});
+
+// Sort
+sortSelect.addEventListener('change', () => {
+  currentSort = sortSelect.value;
+  renderGrid();
+});
+
+// Search
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const val = searchInput.value;
+  searchClear.classList.toggle('show', val.length > 0);
+  searchTimeout = setTimeout(() => {
+    currentSearch = val;
+    if (currentTab === 'stories') renderGrid();
+    else renderMentors();
+  }, 200);
+});
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchClear.classList.remove('show');
+  currentSearch = '';
+  renderGrid();
+  renderMentors();
+});
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.dataset.tab;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${currentTab}`).classList.add('active');
+    if (currentTab === 'stories') {
+      searchInput.placeholder = 'Search stories, mentors, or topics...';
+      filterBar.style.display = '';
+    } else {
+      searchInput.placeholder = 'Search mentors by name or field...';
+      filterBar.style.display = 'none';
+      renderMentors();
+    }
+  });
+});
+
+// Init
+renderGrid();
+renderMentors();
+</script>
+</body>
+</html>
