@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Events | BCIS Alumni Network</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#A42D2D;
+  --accent-dim:#8C2424;
+  --accent-light:#FEF2F2;
+  --accent-subtle:rgba(164,45,45,0.08);
+  --text-1:#1A1714;
+  --text-2:#5C5550;
+  --text-3:#8A847E;
+  --text-4:#B5AFA9;
+  --bg:#FFFDFB;
+  --bg-alt:#F7F4F1;
+  --card:#FFFEFB;
+  --border:#E8E3DE;
+  --border-light:#F0ECE8;
+  --black:#111110;
+  --white:#FFFFFF;
+  --radius:10px;
+  --page-x:clamp(20px,5vw,64px);
+  --wrap-max:none;
+  --desc-max:613px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --nav-h:56px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Gotham','Gotham SSm',system-ui,-apple-system,sans-serif;background:var(--bg-alt);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+a,button,[role="button"]{cursor:pointer}
+.wrap{max-width:var(--wrap-max);margin:0 auto;padding-left:var(--page-x);padding-right:var(--page-x)}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,253,251,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 var(--page-x)}
+.nav-inner{max-width:var(--wrap-max);margin:0 auto;display:flex;align-items:center;height:var(--nav-h);gap:32px}
+.nav-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-1);white-space:nowrap;transition:color 0.2s}
+.nav-logo:hover{color:var(--accent)}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent-light);margin-left:8px;flex-shrink:0}
+
+/* PAGE HEAD (interior, matches homepage section header) */
+.page-head{padding:clamp(28px,4vw,48px) 0 0}
+.crumbs{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;letter-spacing:0.04em;margin-bottom:22px}
+.crumbs a{color:var(--text-3);transition:color 0.2s}
+.crumbs a:hover{color:var(--accent)}
+.crumbs .sep{color:var(--text-4)}
+.crumbs .current{color:var(--text-1)}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-1)}
+.page-title{font-size:clamp(30px,3.2vw,40px);font-weight:700;letter-spacing:-0.02em;line-height:1.1;margin-top:10px}
+.page-title .accent{color:var(--accent)}
+.page-desc{font-size:15px;color:var(--text-2);line-height:1.6;max-width:var(--desc-max);margin-top:12px}
+
+/* FILTERS (light, in-flow — not an app toolbar) */
+.filters-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:26px 0 18px;border-bottom:1px solid var(--border)}
+.search-wrap{position:relative;flex:1;min-width:190px}
+.search-input{width:100%;height:38px;border:1.5px solid var(--border);border-radius:999px;background:var(--card);padding:0 36px 0 40px;font-family:inherit;font-size:13px;color:var(--text-1);transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+.search-input::placeholder{color:var(--text-4)}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-subtle)}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-4);pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;border:none;background:var(--bg-alt);border-radius:50%;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--text-3);font-size:12px}
+.search-clear.show{display:flex}
+.filters{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{height:34px;padding:0 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+.chip:hover{border-color:var(--text-4);color:var(--text-1)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-light)}
+.result-count{font-size:12px;color:var(--text-3);white-space:nowrap;margin-left:6px;flex-shrink:0}
+
+/* LIST — ruled, no container box */
+.list{padding:0 0 84px}
+.ev-card{display:grid;grid-template-columns:64px 1fr 22px;gap:20px;align-items:start;padding:24px 0;border-bottom:1px solid var(--border);transition:opacity 0.2s}
+.ev-card:last-child{border-bottom:none}
+.ev-date{text-align:left;padding-top:2px}
+.ev-month{font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--accent);font-variant-numeric:tabular-nums}
+.ev-day{font-size:25px;font-weight:800;line-height:1;letter-spacing:-0.02em;color:var(--text-1);font-variant-numeric:tabular-nums}
+.ev-year{font-size:10px;font-weight:600;letter-spacing:0.08em;color:var(--text-4);margin-top:3px}
+.ev-tags{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.ev-status{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--accent);color:var(--white);line-height:1}
+.ev-type{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3)}
+.ev-title{font-size:17px;font-weight:600;letter-spacing:-0.01em;line-height:1.25;color:var(--text-1);transition:color 0.2s}
+.ev-desc{font-size:13px;color:var(--text-2);line-height:1.55;margin-top:5px;max-width:var(--desc-max)}
+.ev-meta{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-3);margin-top:8px}
+.ev-meta svg{flex-shrink:0;color:var(--text-4)}
+.ev-arrow{color:var(--accent);align-self:center;transition:transform 0.25s var(--ease),opacity 0.2s;opacity:0}
+.ev-card:hover .ev-arrow{transform:translateX(4px);opacity:1}
+.ev-card:hover .ev-title{color:var(--accent)}
+
+/* Past events: distinguished but still clickable */
+.ev-card.past .ev-month{color:var(--text-3)}
+.ev-card.past .ev-day{color:var(--text-1)}
+.ev-card.past .ev-title{color:var(--text-1)}
+.ev-card.past .ev-status{background:transparent;color:var(--text-3);border:1px solid var(--border)}
+.ev-card.past:hover .ev-title{color:var(--accent)}
+
+/* Past events heading */
+.ev-today{display:block;padding:34px 0 12px;border-bottom:1px solid var(--border)}
+.ev-today-tag{display:block;font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-3);white-space:nowrap}
+.ev-today-dot{display:none}
+.ev-today-line{display:none}
+
+/* EMPTY */
+.empty{text-align:center;padding:56px 20px;color:var(--text-3)}
+.empty svg{color:var(--text-4);margin-bottom:12px}
+.empty p{font-size:14px;line-height:1.6}
+.empty button{margin-top:16px;height:36px;padding:0 18px;border-radius:999px;border:1.5px solid var(--accent);background:none;color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.empty button:hover{background:var(--accent);color:var(--accent-light)}
+
+/* FOOTER */
+footer{background:var(--black);color:rgba(255,255,255,0.6);padding:40px 0 36px;margin-top:8px}
+footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot-brand{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white)}
+.foot-links{display:flex;gap:22px}
+.foot-links a{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.55);transition:color 0.2s}
+.foot-links a:hover{color:var(--accent-light)}
+.foot-copy{font-size:11px;color:rgba(255,255,255,0.35);width:100%}
+
+@media(max-width:680px){
+  .ev-card{grid-template-columns:50px 1fr;gap:14px;padding:20px 0}
+  .ev-arrow{display:none}
+  .ev-day{font-size:22px}
+  .nav-links a:not(.active){display:none}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="homepage.html" class="nav-logo">Alumni Network</a>
+    <div class="nav-links">
+      <a href="homepage-combined.html" class="active">Homepage</a>
+      <a href="directory.html">Directory</a>
+      <a href="Mentor.html">Mentor</a>
+    </div>
+    <div class="nav-avatar">RW</div>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="homepage-combined.html">Homepage</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="current" aria-current="page">Events</span>
+    </nav>
+    <h1 class="page-title">Alumni <span class="accent">Network</span> Events</h1>
+    <p class="page-desc">Reunions, workshops, mixers, and mentorship sessions, everything the network is hosting and everything it just held.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="filters-row">
+    <div class="search-wrap">
+      <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input class="search-input" id="searchInput" type="text" placeholder="Search events, hosts, topics&hellip;" autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+    </div>
+    <div class="filters" id="filters">
+      <button class="chip active" data-type="all">All</button>
+      <button class="chip" data-type="reunion">Reunions</button>
+      <button class="chip" data-type="workshop">Workshops</button>
+      <button class="chip" data-type="mixer">Mixers</button>
+      <button class="chip" data-type="mentorship">Mentorship</button>
+      <button class="chip" data-type="talk">Talks</button>
+    </div>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+
+  <div class="list" id="eventList"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-brand">BCIS Alumni Network</span>
+    <div class="foot-links">
+      <a href="homepage-combined.html">Home</a>
+      <a href="directory.html">Directory</a>
+      <a href="Mentor.html">Mentor</a>
+      <a href="events.html">Events</a>
+    </div>
+    <span class="foot-copy">&copy; 2026 Beijing City International School. Once a BCISer, always a BCISer.</span>
+  </div>
+</footer>
+
+<script>
+function parseLocal(str){const p=str.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+const TODAY = parseLocal('2026-06-18');
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const TYPE_LABEL = {reunion:'Reunion',workshop:'Workshop',mixer:'Mixer',mentorship:'Mentorship',talk:'Talk'};
+
+const EVENTS = [
+  {id:1,title:'Class of 2016 Reunion Gala',type:'reunion',date:'2026-09-26',meta:'The Hall &middot; 6:00 PM',desc:'A decade celebration back where it started, dinner, awards, and the class photo restaged on the front steps.'},
+  {id:2,title:'BCIS Innovation Hub Mixer 2026',type:'mixer',date:'2026-07-22',meta:'Innovation Hub &middot; 7:00 PM',desc:'Reconnect with tech pioneers and founders over drinks in the newest alumni co-working space.'},
+  {id:3,title:'Winter Mentorship Kickoff',type:'mentorship',date:'2026-10-12',meta:'Innovation Hub &middot; 2:00 PM',desc:'New mentor circles open for university applications, portfolios, and early-career guidance.'},
+  {id:4,title:'Alumni Founders Panel',type:'talk',date:'2026-08-15',meta:'Auditorium &middot; 4:00 PM',desc:'Five graduates who built companies share what the first two years actually looked like.'},
+  {id:5,title:'Portfolio Review Workshop',type:'workshop',date:'2026-11-08',meta:'Design Studio &middot; 10:00 AM',desc:'Bring work in progress, leave with senior-designer feedback and a sharper edit.'},
+  {id:6,title:'Innovation Hub Mixer 2025',type:'mixer',date:'2025-12-05',meta:'Innovation Hub',desc:'Last winter’s sold-out mixer, where three alumni startups first met their co-founders.'},
+  {id:7,title:'Career Pivot Workshop',type:'workshop',date:'2026-05-09',meta:'Design Studio',desc:'A hands-on session on changing fields without starting over, with templates and a live Q&A.'},
+  {id:8,title:'Spring Mentorship Circle',type:'mentorship',date:'2026-03-10',meta:'Online',desc:'Six weeks of small-group mentoring across design, engineering, and the arts.'},
+  {id:9,title:'Class of 2015 Reunion Gala',type:'reunion',date:'2025-06-14',meta:'The Hall',desc:'A decade of excellence celebrated at the Hall, the night the alumni fund crossed its goal.'},
+  {id:10,title:'Documentary Storytelling Talk',type:'talk',date:'2026-02-20',meta:'Auditorium',desc:'An alumna filmmaker on turning hometown footage into a festival short.'}
+];
+
+let state = {search:'', type:'all'};
+
+const listEl = document.getElementById('eventList');
+const countEl = document.getElementById('resultCount');
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+
+function fmt(dateStr){
+  const d = parseLocal(dateStr);
+  return {month:MONTHS[d.getMonth()], day:String(d.getDate()).padStart(2,'0'), year:d.getFullYear(), d:d};
+}
+
+function getFiltered(){
+  let items = EVENTS.slice();
+  if(state.type!=='all') items = items.filter(e=>e.type===state.type);
+  if(state.search){
+    const q = state.search.toLowerCase();
+    items = items.filter(e=>
+      e.title.toLowerCase().includes(q) ||
+      e.desc.toLowerCase().includes(q) ||
+      TYPE_LABEL[e.type].toLowerCase().includes(q)
+    );
+  }
+  return items;
+}
+
+function card(e, isPast){
+  const f = fmt(e.date);
+  const status = isPast ? '<span class="ev-status">Recap</span>' : '<span class="ev-status">Upcoming</span>';
+  return `
+    <a class="ev-card${isPast?' past':''}" href="#" aria-label="${e.title}">
+      <div class="ev-date">
+        <div class="ev-month">${f.month}</div>
+        <div class="ev-day">${f.day}</div>
+        <div class="ev-year">${f.year}</div>
+      </div>
+      <div class="ev-body">
+        <div class="ev-tags">${status}<span class="ev-type">${TYPE_LABEL[e.type]}</span></div>
+        <div class="ev-title">${e.title}</div>
+        <p class="ev-desc">${e.desc}</p>
+        <div class="ev-meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg>
+          <span>${e.meta}</span>
+        </div>
+      </div>
+      <svg class="ev-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    </a>`;
+}
+
+function todayMarker(){
+  return `<div class="ev-today"><span class="ev-today-tag">Past events</span><div class="ev-today-line"></div></div>`;
+}
+
+function render(){
+  const items = getFiltered();
+  const upcoming = items.filter(e=>fmt(e.date).d >= TODAY).sort((a,b)=>fmt(a.date).d - fmt(b.date).d);
+  const past = items.filter(e=>fmt(e.date).d < TODAY).sort((a,b)=>fmt(b.date).d - fmt(a.date).d);
+
+  countEl.textContent = `${items.length} event${items.length===1?'':'s'}`;
+
+  if(items.length===0){
+    listEl.innerHTML = `
+      <div class="empty">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <p>No events match your search.</p>
+        <button onclick="clearAll()">Clear filters</button>
+      </div>`;
+    return;
+  }
+
+  let html = upcoming.map(e=>card(e,false)).join('');
+  if(past.length) html += todayMarker();
+  html += past.map(e=>card(e,true)).join('');
+  listEl.innerHTML = html;
+}
+
+function clearAll(){
+  state.search=''; state.type='all';
+  searchInput.value='';
+  searchClear.classList.remove('show');
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.type==='all'));
+  render();
+}
+
+document.getElementById('filters').addEventListener('click',e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  state.type = chip.dataset.type;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c===chip));
+  render();
+});
+
+let searchTimer;
+searchInput.addEventListener('input',()=>{
+  const v = searchInput.value;
+  searchClear.classList.toggle('show', v.length>0);
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(()=>{ state.search=v; render(); },160);
+});
+searchClear.addEventListener('click',()=>{
+  searchInput.value=''; state.search=''; searchClear.classList.remove('show'); render();
+});
+
+render();
+</script>
+</body>
+</html>
