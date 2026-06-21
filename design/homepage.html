@@ -676,14 +676,14 @@
 
     /* ─── DEPARTURES BOARD (split-flap) ───────────────── */
     .departures {
-      background: #A42D2D;
-      padding: 16px var(--page-x);
+      background: var(--black);
+      padding: 19px var(--page-x);
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 32px;
       overflow: hidden;
-      border-top: 1.5px solid var(--border-hard);
-      border-bottom: 1.5px solid var(--border-hard);
+      border-top: 1.5px solid #000;
+      border-bottom: 1.5px solid #000;
     }
 
     .departures-label {
@@ -696,21 +696,21 @@
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.18em;
-      color: #fff;
+      color: var(--accent);
       text-transform: uppercase;
     }
     .departures-label-sub {
       font-size: 9px;
       font-weight: 500;
       letter-spacing: 0.14em;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255,255,255,0.48);
       text-transform: uppercase;
     }
     .departures-label-sub .live-dot {
       display: inline-block;
       width: 5px; height: 5px;
       border-radius: 50%;
-      background: #9fe1cb;
+      background: #4f9e5a;
       margin-right: 5px;
       vertical-align: 1px;
       animation: spotlightPulse 2s ease infinite;
@@ -726,14 +726,14 @@
 
     .flap-cell {
       position: relative;
-      width: 19px;
-      height: 28px;
-      border-radius: 3px;
-      background: #FBF6F0;
-      color: #1A1714;
+      width: 23px;
+      height: 34px;
+      border-radius: 4px;
+      background: #1f1e1c;
+      color: #EDE7E0;
       font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 650;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -747,13 +747,28 @@
       left: 0; right: 0;
       top: 50%;
       height: 1px;
-      background: rgba(0,0,0,0.18);
+      background: rgba(0,0,0,0.58);
     }
     .flap-cell.flipping {
       animation: flapFlip 0.08s linear;
     }
-    .flap-cell.is-accent { color: #A42D2D; }
-    .flap-cell.is-blank { background: #EFE6DD; }
+    .flap-cell.is-accent { color: var(--accent); }
+    .flap-cell.is-blank { background: #191816; }
+    .flap-cell.is-plane {
+      width: 66px;
+      background: transparent;
+      color: var(--accent);
+      overflow: visible;
+    }
+    .flap-cell.is-plane::after { display: none; }
+    .flap-plane {
+      width: 62px;
+      height: 34px;
+      display: block;
+      transform: rotate(90deg);
+      transform-origin: 50% 50%;
+      filter: drop-shadow(0 0 1px rgba(164,45,45,0.45));
+    }
 
     @keyframes flapFlip {
       0%   { transform: scaleY(1); }
@@ -1880,9 +1895,11 @@
       .hero-h1 { font-size: clamp(46px, 13vw, 72px); }
       .hero-cta { padding: 16px 32px; font-size: 15px; }
 
-      .departures { padding: 12px 10px; gap: 0; }
+      .departures { padding: 14px 10px; gap: 0; }
       .departures-label { display: none; }
-      .flap-cell { width: 13px; height: 22px; font-size: 10px; border-radius: 2px; }
+      .flap-cell { width: 14px; height: 24px; font-size: 10px; border-radius: 2px; }
+      .flap-cell.is-plane { width: 38px; }
+      .flap-plane { width: 36px; height: 22px; }
       .flap-board { gap: 2px; }
 
       .intro { grid-template-columns: 1fr; }
@@ -1959,8 +1976,8 @@
 
     <div class="nav-links">
       <a href="#" class="active">Homepage</a>
-      <a href="/functional-updates/directory.html">Directory</a>
-      <a href="/functional-updates/mentor.html">Mentor</a>
+      <a href="#">Directory</a>
+      <a href="#">Mentor</a>
     </div>
     <div class="nav-right" style="position:relative;">
 
@@ -2618,9 +2635,16 @@
     }
 
     function setCell(cell, ch) {
-      cell.textContent = ch === ' ' ? '' : ch;
+      var isPlane = ch === '→';
+      cell.classList.toggle('is-plane', isPlane);
       cell.classList.toggle('is-blank', ch === ' ');
-      cell.classList.toggle('is-accent', ch === '→' || ch === '·');
+      cell.classList.toggle('is-accent', ch === '·');
+
+      if (isPlane) {
+        cell.innerHTML = '<svg class="flap-plane" viewBox="0 0 1024 1024" aria-hidden="true"><path d="M499.843 56.61c-20.929 9.013-43.375 27.886-60.455 52.897l-0.64 0.943c-21.022 31.205-32.945 69.971-32.945 114.956l-0.001 145.859L86.521 637.186A32 32 0 0 0 75 661.775v86.011c0.5 23.38 25.238 38.439 46.302 27.915l295.171-147.468v130.983L314.633 922.03l-0.474 0.78c-15.23 25.788 10.47 56.783 38.832 46.155L512.5 909.197l159.509 59.768 0.858 0.31c28.305 9.79 53.561-21.567 37.5-47.245L608.526 759.216V628.233l295.172 147.468C924.975 786.331 950 770.86 950 747.075v-85.8a32.017 32.017 0 0 0-11.52-24.089L619.196 371.265v-145.86c0-45.438-12.165-84.532-33.585-115.898-17.08-25.01-39.526-43.884-60.455-52.897a32 32 0 0 0-25.314 0zM512.5 123.37l0.28 0.226c6.743 5.478 13.825 12.99 19.98 22.003 14.184 20.77 22.437 47.293 22.437 79.806v160.852l0.004 0.5a32 32 0 0 0 11.517 24.089L886 676.768v18.548L590.828 547.849c-21.276-10.63-46.302 4.842-46.302 28.626V768.4l0.006 0.58a32 32 0 0 0 4.864 16.39l56.624 90.524-82.292-30.834-0.506-0.185a32 32 0 0 0-21.95 0.185l-82.293 30.834 56.625-90.524a32 32 0 0 0 4.87-16.97V576.475l-0.008-0.711c-0.492-23.38-25.23-38.439-46.294-27.915L139 695.316v-18.549l319.282-265.92a32 32 0 0 0 11.52-24.589V225.406c0-32.513 8.254-59.037 22.438-79.806 6.155-9.012 13.237-16.525 19.98-22.003l0.28-0.226z" fill="currentColor"/></svg>';
+      } else {
+        cell.textContent = ch === ' ' ? '' : ch;
+      }
     }
 
     function flipCellTo(cell, target, delay) {
