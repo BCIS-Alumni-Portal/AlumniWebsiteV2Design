@@ -816,22 +816,6 @@
       margin-top: 10px;
     }
 
-    /* Living intro: rotating arc */
-    .intro-left::after {
-      content: '';
-      position: absolute;
-      top: 22%;
-      left: 30%;
-      width: 190px;
-      height: 190px;
-      border: 1.5px solid transparent;
-      border-top-color: var(--accent);
-      border-right-color: rgba(164,45,45,0.1);
-      border-radius: 50%;
-      animation: introSpin 10s linear infinite;
-      pointer-events: none;
-      opacity: 0.35;
-    }
 
     .intro-right {
       padding: 56px var(--page-x) 56px 52px;
@@ -1869,9 +1853,6 @@
       to   { width: 72px; }
     }
 
-    @keyframes introSpin {
-      to { transform: rotate(360deg); }
-    }
 
     @keyframes spotlightPulse {
       0%, 100% { opacity: 1; }
@@ -1885,46 +1866,111 @@
       .nav-burger { display: flex; }
       .mobile-menu { display: block; }
       .nav-right { gap: 4px; margin-left: auto; }
-      .nav-bell { width: 30px; height: 30px; }
-      .nav-bell svg { width: 15px; height: 15px; }
+      .nav-bell { width: 30px; height: 30px; overflow: visible; }
+      .nav-bell svg { width: 16px; height: 16px; position: relative; z-index: 2; }
+      .nav-bell-badge {
+        top: -2px;
+        right: -2px;
+        min-width: 16px;
+        height: 16px;
+        font-size: 8px;
+        z-index: 3;
+        border-width: 2px;
+        box-shadow: 0 0 0 1px rgba(164,45,45,0.08);
+      }
       .nav-avatar { width: 28px; height: 28px; font-size: 10px; }
       .notif-panel { width: calc(100vw - 24px); right: -12px; }
       .profile-panel { width: calc(100vw - 24px); right: -12px; }
 
-      .hero-content { padding: 0 var(--page-x) 40px; }
+      .hero-content { padding: 0 var(--page-x) 16px clamp(42px, 10vw, 56px); }
       .hero-h1 { font-size: clamp(46px, 13vw, 72px); }
       .hero-cta { padding: 16px 32px; font-size: 15px; }
+      .hero-slides {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        align-self: flex-start;
+        margin: 0 0 40px clamp(42px, 10vw, 56px);
+      }
 
-      .departures { padding: 14px 10px; gap: 0; }
+      .departures { padding: 13px var(--page-x) 15px; gap: 0; }
       .departures-label { display: none; }
-      .flap-cell { width: 14px; height: 24px; font-size: 10px; border-radius: 2px; }
-      .flap-cell.is-plane { width: 38px; }
-      .flap-plane { width: 36px; height: 22px; }
-      .flap-board { gap: 2px; }
+      .flap-board {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+      }
+      .flap-board.is-mobile-board {
+        flex-direction: column;
+        gap: 4px;
+      }
+      .flap-row {
+        display: flex;
+        justify-content: center;
+        gap: 2px;
+        width: 100%;
+      }
+      .flap-cell { width: 19px; height: 27px; font-size: 12px; border-radius: 3px; }
+      .flap-cell.is-plane { width: 43px; }
+      .flap-plane { width: 40px; height: 24px; }
 
       .intro { grid-template-columns: 1fr; }
       .intro-left { border-right: none; border-bottom: 1.5px solid var(--border-hard); padding: 32px 28px; }
       .intro-right { padding: 36px 28px; }
+      .intro-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+        column-gap: 0;
+        justify-items: stretch;
+        text-align: left;
+      }
+      .stat {
+        width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .stat + .stat { padding-left: clamp(14px, 4vw, 20px); }
+      .stat-n { font-size: clamp(34px, 12vw, 46px); }
+      .stat-n::after { margin-left: 0; margin-right: 0; }
+      .stat-l { font-size: 8px; letter-spacing: 0.14em; }
 
-      #events { padding: 44px 20px 52px; }
+      #events { padding: 48px 20px 56px; }
       #events::before { display: none; }
-      .events-header { grid-template-columns: 1fr; align-items: start; margin-bottom: 28px; }
-      .events-title { font-size: 28px; }
+      .events-header,
+      .news-header,
+      .gallery-header {
+        display: block;
+        grid-template-columns: none;
+        gap: 0;
+        align-items: start;
+        margin-bottom: 32px;
+      }
+      .section-label,
+      .gallery-label { display: block; margin-bottom: 10px; }
+      .events-title,
+      .news-title,
+      .gallery-title { font-size: 28px; margin: 0; }
+      .events-header .section-link,
+      .news-header .section-link,
+      .gallery-link { display: inline-block; margin-top: 18px; justify-self: start; }
       .event-spotlight { grid-template-columns: 72px 1fr; gap: 20px; padding: 24px 20px; margin-bottom: 24px; }
       .event-spotlight-day { font-size: 40px; }
       .event-spotlight-title { font-size: 18px; }
       .events-layout { grid-template-columns: 1fr; gap: 32px; }
       .event-card { grid-template-columns: 64px 1fr; gap: 14px; }
 
-      .alumni-news { padding: 44px 20px 52px; }
-      .news-header { display: block; }
-      .news-title { font-size: 28px; }
-      .news-stage { margin-top: 20px; }
+      .alumni-news { padding: 48px 20px 56px; }
+      .news-stage { margin-top: 0; }
       .news-stage::before { display: none; }
       .news-publications {
         gap: 14px;
         margin-top: 0;
-        padding: 16px 0 24px;
+        padding: 0 0 24px;
       }
       .publication-card,
       .publication-card:nth-child(n) {
@@ -1937,8 +1983,6 @@
       .publication-meta span { white-space: normal; text-align: right; }
 
       .gallery { padding: 48px 20px 56px; }
-      .gallery-header { grid-template-columns: 1fr; gap: 12px; }
-      .gallery-link { justify-self: start; }
       .spread::before, .spread::after { display: none; }
       .spread-year-group { grid-template-columns: 1fr; }
       .spread-year-group.active { display: flex; flex-direction: column; }
@@ -1946,8 +1990,24 @@
       .spread-page-left { padding-right: 20px; border-bottom: 1px solid var(--border); }
       .spread-page-right { padding-left: 20px; }
       .spread-photos { min-height: 300px; }
-      .spread-nav { gap: 10px; flex-wrap: wrap; justify-content: center; }
-      .spread-nav-dots { order: 3; width: 100%; justify-content: center; margin-top: 8px; }
+      .spread-nav { gap: 10px; flex-wrap: nowrap; justify-content: center; }
+      .spread-nav-arrow { width: 38px; height: 38px; flex: 0 0 38px; }
+      .spread-nav-center { flex: 1 1 auto; min-width: 0; gap: 10px; justify-content: center; }
+      .spread-nav-year { min-width: 96px; font-size: 13px; }
+      .spread-nav-dots {
+        width: 86px;
+        max-width: 22vw;
+        overflow: hidden;
+        justify-content: flex-start;
+        gap: 5px;
+        transform: none;
+      }
+      .spread-nav-dot {
+        flex: 0 0 5px;
+        opacity: 0.45;
+        transform: translateX(var(--dot-offset, 0px));
+      }
+      .spread-nav-dot.active { flex-basis: 18px; opacity: 1; }
 
       .footer-inner { grid-template-columns: 1fr; gap: 28px; padding-top: 28px; }
       footer { padding: 0 20px 28px; }
@@ -2144,7 +2204,7 @@
         <div class="stat-l">COUNTRIES</div>
       </div>
       <div class="stat">
-        <div class="stat-n">30+</div>
+        <div class="stat-n">20+</div>
         <div class="stat-l">YEARS</div>
       </div>
     </div>
@@ -2365,7 +2425,7 @@
         <span class="gallery-label">PHOTO GALLERY</span>
         <h2 class="gallery-title">Graduation <span class="accent">Memories</span></h2>
       </div>
-      <a href="gallery.html" class="gallery-link">Explore all years &#8599;</a>
+      <a href="gallery-desktop-h5-template.html" class="gallery-link">Explore all years &#8599;</a>
     </div>
 
     <div class="spread-container" id="spreadContainer">
@@ -2602,36 +2662,74 @@
     var board = document.getElementById('flapBoard');
     if (!board) return;
 
-    var MOBILE = window.innerWidth <= 480;
-    var CELLS = MOBILE ? 22 : 36;
+    var MOBILE_COLS = 14;
+    var MOBILE_ROWS = 3;
+    var DESKTOP_CELLS = 36;
     var CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·→\'';
-    var MESSAGES = MOBILE ? [
-      'BEIJING → THE WORLD',
-      'ONCE A BCISER',
-      'MENTOR SESSIONS LIVE',
-      '664 ALUMNI · 22 CTYS'
-    ] : [
+    var DESKTOP_MESSAGES = [
       'BEIJING → THE WORLD',
       'ONCE A BCISER · ALWAYS A BCISER',
       'MENTOR SESSIONS NOW LIVE',
       '664 ALUMNI · 22 COUNTRIES · 21 YEARS'
     ];
+    var MOBILE_MESSAGES = [
+      ['BEIJING', '→', 'THE WORLD'],
+      ['ONCE A BCISER', 'ALWAYS A', 'BCISER'],
+      ['MENTOR', 'SESSIONS', 'LIVE'],
+      ['664 ALUMNI', '22 COUNTRIES', '21 YEARS']
+    ];
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Build cells
     var cells = [];
-    for (var i = 0; i < CELLS; i++) {
-      var c = document.createElement('span');
-      c.className = 'flap-cell is-blank';
-      c.textContent = '';
-      board.appendChild(c);
-      cells.push(c);
+    var msgIdx = 0;
+    var isMobileBoard = null;
+
+    function shouldUseMobileBoard() {
+      return window.matchMedia('(max-width: 760px)').matches;
+    }
+
+    function buildBoard() {
+      var mobile = shouldUseMobileBoard();
+      isMobileBoard = mobile;
+      cells = [];
+      board.innerHTML = '';
+      board.classList.toggle('is-mobile-board', mobile);
+
+      if (mobile) {
+        for (var row = 0; row < MOBILE_ROWS; row++) {
+          var rowEl = document.createElement('div');
+          rowEl.className = 'flap-row';
+          board.appendChild(rowEl);
+          for (var col = 0; col < MOBILE_COLS; col++) {
+            var mc = document.createElement('span');
+            mc.className = 'flap-cell is-blank';
+            rowEl.appendChild(mc);
+            cells.push(mc);
+          }
+        }
+      } else {
+        for (var i = 0; i < DESKTOP_CELLS; i++) {
+          var c = document.createElement('span');
+          c.className = 'flap-cell is-blank';
+          board.appendChild(c);
+          cells.push(c);
+        }
+      }
+
+      showMessage(msgIdx, true);
+    }
+
+    function padLine(msg, len) {
+      var lead = Math.max(0, Math.floor((len - msg.length) / 2));
+      return (Array(lead + 1).join(' ') + msg + Array(len + 1).join(' ')).slice(0, len);
     }
 
     function pad(msg) {
-      var lead = Math.floor((CELLS - msg.length) / 2);
-      return (Array(lead + 1).join(' ') + msg + Array(CELLS).join(' ')).slice(0, CELLS);
+      if (isMobileBoard) {
+        return msg.map(function(line) { return padLine(line, MOBILE_COLS); }).join('').slice(0, MOBILE_COLS * MOBILE_ROWS);
+      }
+      var lead = Math.floor((DESKTOP_CELLS - msg.length) / 2);
+      return (Array(lead + 1).join(' ') + msg + Array(DESKTOP_CELLS).join(' ')).slice(0, DESKTOP_CELLS);
     }
 
     function setCell(cell, ch) {
@@ -2647,7 +2745,12 @@
       }
     }
 
-    function flipCellTo(cell, target, delay) {
+    function flipCellTo(cell, target, delay, instant) {
+      if (instant || reduceMotion) {
+        setCell(cell, target);
+        return;
+      }
+
       var spins = 2 + Math.floor(Math.random() * 4);
       setTimeout(function spin() {
         if (spins > 0 && target !== (cell.textContent || ' ')) {
@@ -2664,23 +2767,28 @@
       }, delay);
     }
 
-    var msgIdx = 0;
-    function showMessage(idx) {
-      var text = pad(MESSAGES[idx]);
-      for (var i = 0; i < CELLS; i++) {
-        if (reduceMotion) {
-          setCell(cells[i], text[i]);
-        } else {
-          flipCellTo(cells[i], text[i], i * 18);
-        }
+    function showMessage(idx, instant) {
+      var messages = isMobileBoard ? MOBILE_MESSAGES : DESKTOP_MESSAGES;
+      var text = pad(messages[idx % messages.length]);
+      for (var i = 0; i < cells.length; i++) {
+        flipCellTo(cells[i], text[i] || ' ', i * 18, instant);
       }
     }
 
-    showMessage(0);
+    buildBoard();
     setInterval(function() {
-      msgIdx = (msgIdx + 1) % MESSAGES.length;
-      showMessage(msgIdx);
+      var messages = isMobileBoard ? MOBILE_MESSAGES : DESKTOP_MESSAGES;
+      msgIdx = (msgIdx + 1) % messages.length;
+      showMessage(msgIdx, false);
     }, 4200);
+
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        if (shouldUseMobileBoard() !== isMobileBoard) buildBoard();
+      }, 140);
+    });
   })();
 
   // ─── MOBILE HAMBURGER MENU ────────────────────────────
@@ -2808,6 +2916,7 @@
       gCurrent = index;
       groups[gCurrent].classList.add('active');
       dots[gCurrent].classList.add('active');
+      dotsContainer.style.setProperty('--dot-offset', Math.max(0, gCurrent - 2) * -10 + 'px');
       yearLabel.textContent = 'Class of ' + YEARS[gCurrent];
 
       resetProgress();
