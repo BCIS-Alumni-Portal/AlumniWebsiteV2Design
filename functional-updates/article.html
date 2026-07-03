@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story | BCIS Alumni Network</title>
+<style>
+/* ─── DESIGN SYSTEM (matched to portal) ───────────────── */
+:root{
+  --accent:#A42D2D;--accent-dim:#8C2424;--accent-light:#FEF2F2;--accent-glow:rgba(164,45,45,0.12);
+  --text-1:#1A1714;--text-2:#5C5550;--text-3:#8A847E;--text-4:#B5AFA9;
+  --bg:#FFFDFB;--bg-alt:#F7F4F1;--bg-warm:#F0EAE4;--card:#FFFEFB;
+  --border:#E8E3DE;--black:#111110;--white:#FFFFFF;
+  --shadow-sm:0 1px 2px rgba(26,23,20,0.03);
+  --shadow-md:0 4px 14px rgba(26,23,20,0.045),0 1px 4px rgba(26,23,20,0.025);
+  --shadow-lg:0 10px 28px rgba(26,23,20,0.06),0 3px 8px rgba(26,23,20,0.03);
+  --radius:10px;--radius-lg:14px;--ease:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Gotham','Gotham SSm',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+a,button,[role="button"]{cursor:pointer}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:rgba(255,253,251,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 clamp(20px,5vw,60px)}
+.nav-inner{margin:0 auto;display:flex;align-items:center;height:56px;gap:32px}
+.nav-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-1);text-decoration:none;white-space:nowrap;transition:color 0.2s}
+.nav-logo:hover{color:var(--accent)}
+.nav-burger{display:none;width:34px;height:34px;border:none;background:transparent;border-radius:8px;align-items:center;justify-content:center;color:var(--text-1);transition:background 0.2s;flex-shrink:0}
+.nav-burger:hover{background:rgba(26,23,20,0.05)}
+.nav-burger svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:6px;margin-left:8px;flex-shrink:0}
+.nav-bell{position:relative;width:34px;height:34px;border-radius:50%;border:none;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--text-3);transition:color 0.2s,background 0.2s}
+.nav-bell:hover{color:var(--text-1);background:rgba(26,23,20,0.04)}
+.nav-bell svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-bell-badge{position:absolute;top:4px;right:4px;min-width:15px;height:15px;border-radius:999px;background:var(--accent);color:var(--white);font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;border:2px solid var(--bg)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#FEF2F2;flex-shrink:0}
+.mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(255,253,251,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);box-shadow:0 12px 40px rgba(26,23,20,0.08);z-index:199;padding:12px 20px 20px;transform:translateY(-8px);opacity:0;transition:transform 0.25s var(--ease),opacity 0.2s ease;pointer-events:none}
+.mobile-menu.open{transform:translateY(0);opacity:1;pointer-events:auto}
+.mobile-menu a{display:block;padding:14px 4px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-2);text-decoration:none;border-bottom:1px solid var(--border)}
+.mobile-menu a:last-child{border-bottom:none}
+.mobile-menu a:hover,.mobile-menu a.active{color:var(--accent)}
+
+/* READING */
+.reading{max-width:820px;margin:0 auto;padding:40px clamp(20px,5vw,40px) 0}
+.article-top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:0.04em;color:var(--accent);text-decoration:none;transition:gap 0.2s}
+.back:hover{gap:11px}
+.d-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.d-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.headline{font-size:clamp(30px,4.5vw,46px);font-weight:800;line-height:1.08;letter-spacing:-0.025em;color:var(--text-1);margin-bottom:26px}
+.byline{display:flex;align-items:center;gap:12px;padding-bottom:26px;border-bottom:1px solid var(--border)}
+.byline-author{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;border-radius:999px;transition:opacity 0.2s}
+.byline-author:hover .byline-name{color:var(--accent)}
+.byline-author:hover .byline-av{box-shadow:0 0 0 2px rgba(164,45,45,0.25)}
+.byline-av{transition:box-shadow 0.2s}
+.byline-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#FEF2F2;font-weight:800;font-size:15px;flex-shrink:0;letter-spacing:0.02em}
+.byline-name{font-size:14px;font-weight:700;color:var(--text-1)}
+.byline-meta{font-size:12px;color:var(--text-3);margin-top:2px}
+.share-btn{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-1);background:none;border:1.5px solid var(--border);border-radius:999px;padding:9px 16px;font-family:inherit;transition:border-color 0.2s,color 0.2s}
+.share-btn:hover{border-color:var(--accent);color:var(--accent)}
+.share-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hero-figure{margin:34px 0 0}
+.hero-img{aspect-ratio:16/8;border-radius:12px;background:radial-gradient(circle at 72% 26%,rgba(164,45,45,0.20),transparent 55%),linear-gradient(150deg,#E7D4C4,#D7B6A4);position:relative;overflow:hidden}
+.hero-img::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 38px,rgba(255,255,255,0.04) 38px,rgba(255,255,255,0.04) 39px),repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(255,255,255,0.04) 38px,rgba(255,255,255,0.04) 39px)}
+.hero-cap{font-size:12px;color:var(--text-4);margin-top:11px;font-style:italic}
+.body{font-size:18px;line-height:1.78;color:var(--text-2);margin-top:30px;max-width:720px}
+.body p{margin-bottom:22px}
+.body p:first-child{font-size:19px;color:var(--text-1);line-height:1.7}
+.body p strong{color:var(--text-1);font-weight:700}
+.pullquote{font-size:clamp(21px,2.6vw,27px);font-weight:800;font-style:italic;line-height:1.32;letter-spacing:-0.015em;color:var(--accent);margin:30px 0;padding-left:2px}
+.about{margin-top:14px;border-top:1px solid var(--border);padding-top:28px}
+.about-label{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px}
+.about-row{display:flex;gap:15px}
+.about-av{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#FEF2F2;font-weight:800;font-size:17px;flex-shrink:0}
+.about-name{font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:6px}
+.about-name span{color:var(--accent)}
+.about-bio{font-size:13px;line-height:1.6;color:var(--text-2)}
+.tags{margin-top:30px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tags-label{width:100%;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+.tag{font-size:12px;font-weight:600;color:var(--text-2);border:1.5px solid var(--border);border-radius:999px;padding:7px 14px;text-decoration:none;transition:border-color 0.2s,color 0.2s}
+.tag:hover{border-color:var(--accent);color:var(--accent)}
+
+/* RELATED */
+.related{background:var(--bg-alt);border-top:1px solid var(--border);margin-top:52px;padding:48px clamp(20px,5vw,60px) 64px}
+.related-inner{max-width:1100px;margin:0 auto}
+.related-head{font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-1);margin-bottom:22px}
+.related-head .ac{color:var(--accent)}
+.related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{position:relative;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;text-decoration:none;color:inherit;display:block;transition:transform 0.3s var(--ease),box-shadow 0.3s var(--ease),border-color 0.3s}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 0.3s var(--ease);z-index:3}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.card:hover::before{transform:scaleX(1)}
+.card-thumb{aspect-ratio:16/10;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-thumb.type-recording{background:radial-gradient(circle at 72% 28%,rgba(164,45,45,0.28),transparent 60%),linear-gradient(145deg,#241A1A,#3A2828)}
+.card-thumb.type-article{background:var(--bg-alt)}
+.card-thumb.type-session{background:var(--bg-warm)}
+.card-thumb .play-circle{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.16);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center}
+.card:hover .play-circle{background:var(--accent)}
+.card-thumb .thumb-icon{color:var(--text-4);opacity:0.55}
+.card-thumb .duration{position:absolute;bottom:9px;right:9px;padding:4px 9px;border-radius:6px;background:rgba(0,0,0,0.55);font-size:11px;font-weight:700;color:rgba(255,255,255,0.92)}
+.card-body{padding:15px 16px 17px}
+.card-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+.card-tag .tag-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.card-title{font-size:15px;font-weight:700;line-height:1.32;color:var(--text-1);margin-bottom:9px;letter-spacing:-0.01em}
+.card-author{font-size:12px;color:var(--text-3)}
+.card-author span{color:var(--text-1);font-weight:700}
+
+/* FOOTER */
+footer{background:var(--black);padding:0 clamp(20px,5vw,60px) 36px}
+.footer-rule{height:3px;background:var(--accent)}
+.footer-inner{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:48px;align-items:start;max-width:1200px;margin:0 auto;padding-top:44px}
+.footer-logo{font-size:13px;font-weight:700;letter-spacing:0.14em;color:var(--white);text-transform:uppercase;margin-bottom:14px}
+.footer-logo span{color:var(--accent)}
+.footer-tagline{font-size:13px;color:#6a6661;line-height:1.8;max-width:340px}
+.footer-col-label{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.footer-link{display:block;font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;margin-bottom:11px;transition:color 0.2s}
+.footer-link:hover{color:var(--accent)}
+.footer-bottom{max-width:1200px;margin:36px auto 0;padding-top:18px;border-top:0.5px solid #1e1e1c;font-size:9px;font-weight:500;letter-spacing:0.1em;color:#3a3a37}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text-1);color:var(--bg);font-size:12px;font-weight:600;letter-spacing:0.02em;padding:11px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity 0.25s,transform 0.25s;z-index:300}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:1024px){.related-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){
+  .nav-links{display:none}.nav-burger{display:flex}.mobile-menu{display:block}.nav-right{margin-left:auto}
+  .footer-inner{grid-template-columns:1fr;gap:28px;padding-top:32px}
+}
+@media(max-width:560px){.related-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.reading>*{animation:fadeUp 0.5s var(--ease) both}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="mentor.html" class="nav-logo">Alumni Network</a>
+    <button class="nav-burger" id="burgerBtn" aria-label="Menu"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="nav-links">
+      <a href="/design/homepage.html">Homepage</a><a href="directory.html">Directory</a><a href="mentor.html" class="active">Mentor</a>
+    </div>
+    <div class="nav-right">
+      <button class="nav-bell" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="nav-bell-badge">3</span></button>
+      <div class="nav-avatar">RW</div>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/design/homepage.html">Homepage</a><a href="directory.html">Directory</a><a href="mentor.html" class="active">Mentor</a>
+</div>
+
+<article class="reading" id="reading"></article>
+
+<section class="related">
+  <div class="related-inner">
+    <div class="related-head">More from the <span class="ac">Mentor Hub</span></div>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-rule"></div>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">BCIS Alumni <span>Network</span></div>
+      <p class="footer-tagline">Recordings, articles, and mentorship shared by BCISers, for BCISers. Once a BCISer, always a BCISer.</p>
+    </div>
+    <div>
+      <div class="footer-col-label">Explore</div>
+      <a href="mentor.html" class="footer-link">Stories &amp; Insights</a>
+      <a href="mentor.html" class="footer-link">Browse Mentors</a>
+      <a href="#" class="footer-link">Become a Mentor</a>
+    </div>
+    <div>
+      <div class="footer-col-label">Network</div>
+      <a href="/design/homepage.html" class="footer-link">Homepage</a>
+      <a href="directory.html" class="footer-link">Directory</a>
+      <a href="alumni-pass.html" class="footer-link">Alumni Pass</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 BCIS ALUMNI NETWORK. ALL RIGHTS RESERVED.</div>
+</footer>
+
+<div class="toast" id="toast">Link copied to clipboard</div>
+
+<script>
+const CONTENT=[
+  {id:1,title:"Breaking Into Motion Design Without a Traditional Portfolio",author:"Jenny Huang",classYear:"Class of 2022",type:"recording",topic:"career",duration:"38 min",date:new Date("2025-11-15"),views:342,excerpt:"How I built a reel that got me hired with zero agency experience."},
+  {id:2,title:"How I Cold-Emailed My Way to a Full-Time Studio Job",author:"Marco Torres",classYear:"Class of 2020",type:"article",topic:"career",readTime:"7 min read",date:new Date("2025-10-28"),views:521,excerpt:"The exact email template and follow-up cadence that landed offers."},
+  {id:3,title:"Negotiating Your First Offer: What They Don't Teach You",author:"Sarah Liu",classYear:"Class of 2023",type:"recording",topic:"career",duration:"52 min",date:new Date("2025-10-15"),views:287,excerpt:"Scripts, leverage, and the questions to ask before you sign."},
+  {id:4,title:"Portfolio Crit: UX Case Studies That Actually Land",author:"David Kim",classYear:"Class of 2021",type:"recording",topic:"portfolio",duration:"24 min",date:new Date("2025-09-20"),views:198,excerpt:"A live teardown of three portfolios and what recruiters skip."},
+  {id:5,title:"Freelance Rate Setting 101: Know Your Worth",author:"Amy Zhang",classYear:"Class of 2022",type:"session",topic:"freelancing",date:new Date("2025-09-05"),views:156,excerpt:"A pricing framework that stops you from undercharging."},
+  {id:6,title:"The Gap Between School and Studio: What Nobody Told Me",author:"Priya Nair",classYear:"Class of 2021",type:"article",topic:"industry",readTime:"5 min read",date:new Date("2025-08-22"),views:413,excerpt:"The unspoken expectations of your first year on the job."},
+  {id:7,title:"Building Your Network Before Graduation",author:"Alex Wang",classYear:"Class of 2023",type:"article",topic:"career",readTime:"4 min read",date:new Date("2025-08-10"),views:289,excerpt:"Where to find your first 100 industry connections."},
+  {id:8,title:"From BCIS to the Ivy League: My Application Journey",author:"Kevin Chen",classYear:"Class of 2019",type:"recording",topic:"gradschool",duration:"45 min",date:new Date("2025-12-01"),views:567,excerpt:"The full story of how I went from BCIS to a top graduate film program, essays and rejections included."},
+  {id:9,title:"The Creative Process Behind Award-Winning Short Films",author:"Luna Ma",classYear:"Class of 2020",type:"session",topic:"creative",date:new Date("2025-07-15"),views:178,excerpt:"From first idea to festival cut, my full workflow."},
+  {id:10,title:"From Beijing to Berlin: My Design Career Journey",author:"Sophie Ren",classYear:"Class of 2018",type:"article",topic:"industry",readTime:"8 min read",date:new Date("2025-11-30"),views:445,excerpt:"Moving across continents to chase a design career abroad."}
+];
+const MENTORS=[
+  {name:"Jenny Huang",field:"Motion Design",bio:"Award-winning motion designer at a creative studio in Shanghai, focused on title sequences and brand films."},
+  {name:"Marco Torres",field:"Illustration",bio:"Freelance illustrator working with editorial and tech clients globally."},
+  {name:"Sarah Liu",field:"Product Design",bio:"Product designer at a leading tech company in Beijing."},
+  {name:"Kevin Chen",field:"Film Studies",bio:"Documentary filmmaker, Columbia MFA graduate, Sundance selectee."},
+  {name:"Priya Nair",field:"Graphic Design",bio:"Brand designer at a global design agency in London."}
+];
+const AVATAR_COLORS=['#A42D2D','#2C2724','#6B4A3A','#8C2424','#46352E'];
+const TOPIC_LABEL={career:'Career',portfolio:'Portfolio',industry:'Industry',creative:'Creative',freelancing:'Freelancing',gradschool:'Grad School'};
+const TOPIC_FIELD={career:'Career & Hiring',portfolio:'Portfolio Craft',industry:'Industry Insight',creative:'Creative Practice',freelancing:'Freelancing',gradschool:'Grad School'};
+
+function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function avatarColor(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
+function fmtDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function authorInfo(it){
+  const m=MENTORS.find(x=>x.name===it.author);
+  if(m)return{field:m.field,bio:m.bio};
+  const first=it.author.split(' ')[0];
+  return{field:TOPIC_FIELD[it.topic]||'Alumni',bio:`${first} is a BCIS alum from the ${it.classYear}, sharing lessons from their journey with the next generation of Warriors.`};
+}
+
+const BODIES=[
+  [
+    "When I was sitting where you are now, I assumed everyone else had it figured out. They didn't. The truth is that most of the people I now admire took messy, non-linear paths to get where they are, and they were just better at not showing the uncertainty.",
+    "The single most useful thing I did was to stop waiting for permission. Nobody was going to hand me the opportunity, so I started making small bets, cold emails, side projects, awkward introductions, and treated every reply as information rather than a verdict on my worth.",
+    {q:"Treat every “no” as data, not a verdict. The people who make it are simply the ones who kept asking."},
+    "If I could compress everything into one idea, it would be this: optimise for learning, not for looking impressive. The titles and the logos matter far less than whether you are measurably better at your craft than you were three months ago.",
+    "Reach out if any of this resonates. The entire point of this network is that you never have to figure it out alone, because someone two or three years ahead of you has already made the exact mistakes you are worried about right now."
+  ],
+  [
+    "Everyone told me to “build my network,” and for years that advice felt useless, like being told to be taller. It only clicked when I reframed it: a network isn't a list of contacts, it's a small group of people who have genuinely seen you do good work.",
+    "So I stopped collecting connections and started being useful. I shared notes, I sent people opportunities that weren't right for me, I followed up months later just to say how something they made had helped. Generosity compounds in ways that self-promotion never does.",
+    {q:"Be the person who sends the opportunity, not the one who only asks for it. That reputation travels faster than any résumé."},
+    "The break I eventually got didn't come from a recruiter or an application form. It came from someone I'd helped two years earlier, who remembered me when a role opened up that was never publicly posted.",
+    "If you take one thing from this, let it be that the boring, patient version of networking is the one that actually works. Show up, be useful, stay in touch, and let time do the rest."
+  ],
+  [
+    "The hardest part of leaving BCIS wasn't the work, it was the silence after. No more clear assignments, no more obvious next step, just a wide-open field and the quiet pressure of figuring out what mattered to me on my own terms.",
+    "What helped was treating my first couple of years as deliberate experiments rather than permanent decisions. I gave myself permission to try a direction fully, learn what I actually liked and hated about it, and pivot without treating the change as failure.",
+    {q:"Your first job is not your last job. It's the most expensive, most useful class you'll ever take, so choose it for what it teaches you."},
+    "I kept a simple running note of moments that energised me and moments that drained me. Over time the pattern was obvious, and it pointed me somewhere I never would have planned for on graduation day.",
+    "Wherever you land, stay curious and stay in touch with the people who knew you here. The Warrior network is small enough to be personal and wide enough to open real doors, but only if you actually use it."
+  ]
+];
+
+function getId(){const p=parseInt(new URLSearchParams(location.search).get('id'));return CONTENT.some(c=>c.id===p)?p:CONTENT[0].id;}
+
+function renderArticle(){
+  const it=CONTENT.find(c=>c.id===getId());
+  document.title=it.title+' | BCIS Alumni Network';
+  const meta=it.readTime||it.duration||'';
+  const ai=authorInfo(it);
+  const body=BODIES[it.id%BODIES.length];
+  let bodyHtml=`<p><strong>${it.excerpt}</strong> This is the full story of how it actually happened, and what I'd tell my younger self if I could go back.</p>`;
+  body.forEach(part=>{
+    if(typeof part==='string')bodyHtml+=`<p>${part}</p>`;
+    else bodyHtml+=`<p class="pullquote">“${part.q}”</p>`;
+  });
+  const tagList=[TOPIC_LABEL[it.topic],it.classYear,it.type==='session'?'Session Notes':'Article','Mentor Hub'];
+  document.getElementById('reading').innerHTML=`
+    <div class="article-top-bar">
+      <a class="back" href="mentor.html">&larr; Back to Mentor Hub</a>
+      <button class="share-btn" id="shareBtn"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button>
+    </div>
+    <h1 class="headline">${it.title}</h1>
+    <div class="byline">
+      <a class="byline-author" href="mentor.html" title="View ${it.author}'s profile">
+        <div class="byline-av" style="background:${avatarColor(it.author)}">${initials(it.author)}</div>
+        <div>
+          <div class="byline-name">${it.author}</div>
+          <div class="byline-meta">${it.classYear} &middot; ${fmtDate(it.date)}${meta?' &middot; '+meta:''}</div>
+        </div>
+      </a>
+    </div>
+    <figure class="hero-figure"><div class="hero-img"></div><figcaption class="hero-cap">${it.excerpt}</figcaption></figure>
+    <div class="body">${bodyHtml}</div>
+    <div class="tags">
+      <span class="tags-label">Explore more</span>
+      ${tagList.map(t=>`<a class="tag" href="mentor.html">${t}</a>`).join('')}
+    </div>`;
+  document.getElementById('shareBtn').addEventListener('click',share);
+  renderRelated(it);
+}
+
+function relCard(it){
+  const page=it.type==='recording'?'watch':'article';
+  const typeLabel={recording:'Recording',article:'Article',session:'Session Notes'}[it.type];
+  const meta=it.duration||it.readTime||'';
+  let thumb;
+  if(it.type==='recording')thumb=`<div class="play-circle"><svg width="15" height="15" viewBox="0 0 16 16" fill="#FFFDFB"><path d="M4 2l10 6-10 6V2z"/></svg></div>${it.duration?`<span class="duration">${it.duration}</span>`:''}`;
+  else if(it.type==='article')thumb=`<svg class="thumb-icon" width="34" height="34" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="5" width="20" height="26" rx="2.5"/><line x1="12" y1="12" x2="24" y2="12"/><line x1="12" y1="16.5" x2="24" y2="16.5"/><line x1="12" y1="21" x2="20" y2="21"/></svg>`;
+  else thumb=`<svg class="thumb-icon" width="34" height="34" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="18" r="10"/><circle cx="18" cy="18" r="3.5"/><line x1="18" y1="8" x2="18" y2="11"/><line x1="18" y1="25" x2="18" y2="28"/></svg>`;
+  return `<a class="card" href="${page}.html?id=${it.id}">
+    <div class="card-thumb type-${it.type}">${thumb}</div>
+    <div class="card-body">
+      <div class="card-tag"><span class="tag-dot"></span>${typeLabel}</div>
+      <div class="card-title">${it.title}</div>
+      <div class="card-author"><span>${it.author}</span> &middot; ${it.classYear}${meta?' &middot; '+meta:''}</div>
+    </div></a>`;
+}
+
+function renderRelated(it){
+  let pool=CONTENT.filter(c=>c.id!==it.id);
+  pool.sort((a,b)=>((b.topic===it.topic)-(a.topic===it.topic))||b.views-a.views);
+  document.getElementById('relatedGrid').innerHTML=pool.slice(0,3).map(relCard).join('');
+}
+
+function share(){
+  const url=location.href;
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(showToast,showToast);
+  else showToast();
+}
+let toastT;
+function showToast(){const t=document.getElementById('toast');t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}
+
+(function(){
+  const burger=document.getElementById('burgerBtn'),menu=document.getElementById('mobileMenu');
+  const open='<svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+  const close='<svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>';
+  burger.addEventListener('click',e=>{e.stopPropagation();const o=menu.classList.contains('open');menu.classList.toggle('open');burger.innerHTML=o?open:close;});
+  document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!burger.contains(e.target)&&menu.classList.contains('open')){menu.classList.remove('open');burger.innerHTML=open;}});
+})();
+
+renderArticle();
+</script>
+</body>
+</html>
