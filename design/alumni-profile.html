@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Alumni Profile | BCIS Alumni Network</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#A42D2D; --accent-dim:#8C2424; --accent-light:#FEF2F2;
+  --accent-glow:rgba(164,45,45,0.12); --accent-subtle:rgba(164,45,45,0.08);
+  --text-1:#1A1714; --text-2:#5C5550; --text-3:#8A847E; --text-4:#B5AFA9;
+  --bg:#FFFDFB; --bg-alt:#F7F4F1; --bg-warm:#F0EAE4; --card:#FFFEFB;
+  --border:#E8E3DE; --border-light:#F0ECE8; --border-hard:#1A1714;
+  --black:#111110; --white:#FFFFFF;
+  --shadow-sm:0 1px 2px rgba(26,23,20,0.03);
+  --shadow-md:0 4px 14px rgba(26,23,20,0.045),0 1px 4px rgba(26,23,20,0.025);
+  --shadow-lg:0 10px 28px rgba(26,23,20,0.06),0 3px 8px rgba(26,23,20,0.03);
+  --radius:10px; --radius-lg:14px;
+  --page-x:clamp(20px,5vw,64px); --content-max:none;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --nav-h:56px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Gotham','Gotham SSm',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+a,button{cursor:pointer;font-family:inherit}
+
+/* ── NAV ─────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,253,251,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 var(--page-x)}
+.nav-inner{max-width:var(--content-max);margin:0 auto;display:flex;align-items:center;height:var(--nav-h);gap:32px}
+.nav-logo{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-1);text-decoration:none;white-space:nowrap}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent-light);margin-left:8px;flex-shrink:0}
+
+/* ── LAYOUT ──────────────────────────────────── */
+.profile{max-width:var(--content-max);margin:0 auto;padding:clamp(28px,4vw,52px) var(--page-x) 0}.breadcrumb{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:clamp(24px,3vw,36px)}
+.breadcrumb a{color:var(--text-3);text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb .sep{color:var(--text-4)}
+.breadcrumb .here{color:var(--text-1)}
+
+.profile-grid{display:grid;grid-template-columns:minmax(360px,2fr) minmax(0,3fr);gap:clamp(32px,4vw,60px);align-items:start}
+
+/* ── IDENTITY RAIL ───────────────────────────── */
+.rail{position:sticky;top:calc(var(--nav-h) + 24px)}
+.rail-top{display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;align-items:center}
+.avatar-wrap{position:relative;width:104px;height:104px;display:flex;align-items:center;justify-content:center}
+.avatar{position:relative;z-index:1;width:104px;height:104px;border-radius:50%;object-fit:cover;background:var(--bg-warm);border:1px solid var(--border);display:block;font-size:0}
+.avatar-fallback{position:absolute;inset:0;border-radius:50%;background:var(--accent);color:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;letter-spacing:0.02em}
+.avatar.is-missing{display:none}
+.rail-id{min-width:0}
+.id-name{font-size:clamp(22px,2vw,26px);font-weight:800;letter-spacing:-0.02em;line-height:1.12}
+.id-name .pref{font-weight:inherit;font-size:1em;color:inherit}
+.id-meta{display:flex;align-items:center;flex-wrap:wrap;margin-top:12px}.id-class{font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)}.id-residence{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text-3)}
+.id-residence::before{content:"\00B7";margin:0 8px;color:var(--text-4);font-weight:700}
+.id-residence svg{color:var(--text-4);flex-shrink:0}
+.id-labels{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.avail{display:inline-flex;align-items:center;font-size:12px;font-weight:700;letter-spacing:0.04em;padding:6px 13px;border-radius:999px;background:var(--accent);color:var(--white)}
+
+/* Ask panel */
+.ask{margin-top:26px;border:none;background:none;padding:0;box-shadow:none}.ask-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-1);margin-bottom:12px}
+.ask-title svg{color:var(--accent)}.ask-last{display:flex;align-items:flex-start;gap:7px;margin:0 0 12px;padding:9px 11px;border-radius:8px;background:var(--accent-subtle);color:var(--accent-dim);font-size:12px;font-weight:500;line-height:1.45}
+.ask-last svg{flex-shrink:0;margin-top:1px;color:var(--accent)}
+.ask-last b{font-weight:700}
+.ask-input{width:100%;min-height:88px;resize:vertical;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);padding:10px 12px;font-size:13px;line-height:1.5;color:var(--text-1);transition:border-color .2s,box-shadow .2s;outline:none}
+.ask-input::placeholder{color:var(--text-4)}
+.ask-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-subtle)}.ask-consent{margin:10px 0 14px;font-size:12px;line-height:1.5;color:var(--text-3)}
+.ask-consent span{color:var(--accent);font-weight:700}
+.ask-send{display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;border:none;background:var(--accent);color:var(--white);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:12px 18px;border-radius:999px;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(164,45,45,0.22)}
+.ask-send span{transition:transform .2s var(--ease)}
+.ask-send:hover:not(:disabled){background:var(--accent-dim);transform:translateY(-1px);box-shadow:0 6px 20px rgba(164,45,45,0.3)}
+.ask-send:hover:not(:disabled) span{transform:translateX(3px)}
+.ask-send:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+.ask-sent{display:flex;gap:12px;align-items:flex-start;padding:4px 2px;animation:fadeUp .45s var(--ease) both}
+.ask-sent-check{flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--white);display:flex;align-items:center;justify-content:center}
+.ask-sent strong{display:block;font-size:13px;font-weight:700;color:var(--text-1)}.ask-sent p{margin-top:3px;font-size:12px;font-weight:500;line-height:1.5;color:var(--text-2)}
+
+/* Contacts */
+.contacts{margin-top:24px}
+.rail-label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px}
+.contact-rows{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.crow{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 10px;border:1px solid var(--border-light);border-radius:9px;background:var(--card);transition:border-color .2s,background .2s}
+.crow:hover{border-color:var(--accent-glow);background:var(--bg-alt)}
+.crow-ic{display:flex;align-items:center;color:var(--text-2);flex-shrink:0}
+.crow-ic svg{width:16px;height:16px}.crow-id{flex:1;min-width:0;border:none;background:none;padding:0;font-size:12px;font-weight:500;color:var(--text-1);cursor:pointer;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow-id.copied{color:var(--accent)}
+.crow-trail{flex-shrink:0;display:flex;align-items:center;color:var(--text-4);text-decoration:none;transition:color .2s}
+a.crow-trail:hover{color:var(--accent)}
+
+/* ── EXPERIENCES ─────────────────────────────── */
+.exp-group{margin-bottom:clamp(30px,4vw,44px)}
+.exp-group-head{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.exp-group-head h2{font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent)}
+.exp-group-head .rule{flex:1;height:1px;background:var(--border)}
+.timeline{border-left:1.5px solid var(--border);padding-left:26px;margin-left:5px}
+.exp{position:relative;padding-bottom:26px}
+.exp:last-child{padding-bottom:0}
+.exp::before{content:'';position:absolute;left:-33px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--border)}
+.exp.current::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-subtle)}
+.exp-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.exp-role{font-size:16px;font-weight:700;letter-spacing:-0.01em;color:var(--text-1);line-height:1.3}.exp-years{flex-shrink:0;font-size:12px;font-weight:500;letter-spacing:0.02em;color:var(--text-3);font-variant-numeric:tabular-nums;white-space:nowrap}.exp-org{margin-top:4px;font-size:13px;font-weight:500;color:var(--text-2)}.exp-loc{margin-top:6px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text-3)}
+.exp-loc svg{color:var(--text-4)}
+.current-tag{display:inline-block;margin-left:10px;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-subtle);padding:2px 8px;border-radius:999px;vertical-align:middle}
+
+/* ── RECOMMENDATIONS ─────────────────────────── */
+.recommendations{margin-top:clamp(48px,6vw,72px);border-top:1px solid var(--border);padding:clamp(36px,4vw,52px) 0 clamp(48px,6vw,80px)}
+.rec-head{margin-bottom:26px}.rec-label{font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.rec-head h2{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-0.02em;color:var(--text-1)}
+.rec-head h2 em{font-style:italic;color:var(--accent)}
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rec-card{position:relative;display:grid;grid-template-columns:60px minmax(0,1fr);gap:16px;align-items:center;text-decoration:none;color:inherit;border:1px solid var(--border-light);border-radius:var(--radius-lg);background:var(--card);padding:20px 22px;box-shadow:var(--shadow-sm);transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .2s}
+.rec-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--accent-glow)}
+.rec-av{width:60px;height:60px;border-radius:50%;background:var(--accent);color:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+.rec-body{min-width:0}
+.rec-name-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0}.rec-name{font-size:16px;font-weight:700;letter-spacing:-0.01em;line-height:1.2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-name .pref{font-weight:inherit;font-size:1em;color:inherit}
+.rec-mentor{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--white);background:var(--accent);padding:3px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0}.rec-sub{margin-top:5px;font-size:12px;font-weight:500;color:var(--text-3);display:flex;align-items:center;gap:5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-sub svg{color:var(--text-4);flex-shrink:0}.rec-exp{margin-top:5px;font-size:12px;font-weight:500;color:var(--text-2);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-tag{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent-dim);background:var(--accent-subtle);padding:3px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0}
+
+/* ── FOOTER ──────────────────────────────────── */
+footer{background:var(--black);padding:0 var(--page-x) 36px}
+.footer-rule{height:3px;background:var(--accent)}
+.footer-inner{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:48px;align-items:start;max-width:var(--content-max);margin:0 auto;padding-top:40px}
+.footer-brand{display:flex;flex-direction:column;gap:14px}
+.footer-logo{font-size:13px;font-weight:700;letter-spacing:0.14em;color:var(--white);text-transform:uppercase}
+.footer-logo span{color:var(--accent)}
+.footer-tagline{font-size:13px;color:#555;line-height:1.8;max-width:360px}
+.footer-socials{display:flex;gap:12px;margin-top:16px}
+.footer-social{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);text-decoration:none;transition:border-color .2s,color .2s,transform .2s}
+.footer-social:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.footer-col-label{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.footer-link{display:block;font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;margin-bottom:10px;transition:color .2s}
+.footer-link:hover{color:var(--accent)}
+.footer-bottom{margin-top:36px;padding-top:18px;border-top:0.5px solid #1e1e1c;display:flex;justify-content:space-between;align-items:center;max-width:var(--content-max);margin-left:auto;margin-right:auto}
+.footer-copy{font-size:9px;font-weight:500;letter-spacing:0.1em;color:#4a4a47}
+
+/* ── MOTION / ENTRANCE ───────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.in{opacity:1;transform:none;transition:opacity .6s var(--ease),transform .6s var(--ease)}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width:900px){
+  .profile-grid{grid-template-columns:1fr;gap:32px}
+  .rail{position:static}
+  .rec-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:600px){
+  .nav-links a:not(.active){display:none}
+  .id-name{white-space:normal}
+  .exp-top{flex-direction:column;gap:2px}
+  .rec-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr;gap:30px}
+}
+@media (prefers-reduced-motion:reduce){
+  .reveal,.reveal.in{opacity:1;transform:none;transition:none}
+  .ask-sent{animation:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="homepage.html" class="nav-logo">Alumni Network</a>
+    <div class="nav-links">
+      <a href="homepage.html">Homepage</a>
+      <a href="../functional-updates/directory.html" class="active">Directory</a>
+      <a href="../functional-updates/mentor.html">Mentor</a>
+    </div>
+    <div class="nav-avatar">RW</div>
+  </div>
+</nav>
+
+<main class="profile">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="directory.html">Directory</a>
+    <span class="sep">/</span>
+    <span class="here" id="crumbName">Profile</span>
+  </nav>
+
+  <div class="profile-grid">
+    <aside class="rail" aria-label="Identity and contact">
+      <div class="rail-top">
+        <div class="avatar-wrap">
+          <span class="avatar-fallback" id="avatarFallback" aria-hidden="true"></span>
+          <img class="avatar" id="avatar" alt="" src="assets/alumni-avatar.png">
+        </div>
+        <div class="rail-id">
+          <h1 class="id-name" id="name"></h1>
+          <div class="id-meta">
+            <div class="id-class" id="class"></div>
+            <div class="id-residence" id="residence" hidden></div>
+          </div>
+        </div>
+      </div>
+      <div class="id-labels" id="labels"></div>
+      <div id="contactsMount"></div>
+      <div id="askMount"></div>
+    </aside>
+
+    <section class="main-col" aria-label="Experiences">
+      <div id="experiences"></div>
+    </section>
+  </div>
+
+  <section class="recommendations reveal" id="recommendations" aria-label="Similar alumni recommendations"></section>
+</main>
+
+<footer>
+  <div class="footer-rule"></div>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">BCIS Alumni <span>Network</span></div>
+      <p class="footer-tagline">We welcome all former BCIS community members to stay connected as BCIS Alumni.</p>
+      <div class="footer-socials" aria-label="Social links">
+        <a href="#" class="footer-social" aria-label="WeChat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8.5 11a1 1 0 100-2 1 1 0 000 2zM5 11a1 1 0 100-2 1 1 0 000 2z"/><path d="M2 8.5C2 5.46 5.13 3 9 3s7 2.46 7 5.5c0 1.37-.6 2.62-1.59 3.6L15 15l-2.77-1.16A8.6 8.6 0 019 14C5.13 14 2 11.54 2 8.5z"/><path d="M16 19l2.5 1-.4-2.1A4.8 4.8 0 0020 14.5C20 12.01 17.76 10 15 10"/></svg></a>
+        <a href="#" class="footer-social" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/></svg></a>
+        <a href="#" class="footer-social" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a>
+        <a href="mailto:alumni@bcis.cn" class="footer-social" aria-label="Email"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-label">Service</div>
+      <a href="#" class="footer-link">Academic Profile Application</a>
+      <a href="alumni-pass.html" class="footer-link">Alumni Pass Registration</a>
+      <a href="#" class="footer-link">Visitor Reservation</a>
+    </div>
+    <div>
+      <div class="footer-col-label">About</div>
+      <a href="#" class="footer-link">About This Website</a>
+      <a href="#" class="footer-link">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; 2026 BCIS ALUMNI NETWORK. ALL RIGHTS RESERVED.</span>
+  </div>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────────────────
+   PROFILE DATA — the whole page renders from this object.
+   Swap it out to show a different alum. Everything is
+   conditional: only present fields render.
+   ───────────────────────────────────────────────────────── */
+var DATA = {
+  name: "Zhao, Wen Xin",
+  preferred: "Rose",        // English / preferred name — rendered in ( )
+  classYear: 2016,
+  residence: "Tokyo, Japan",  // current city of residence
+  photo: "assets/alumni-avatar.png",
+  mentoring: true,          // shows the "Mentoring" label (label only)
+  openToQuestions: true,    // shows the "Open to questions" label + ask panel
+  lastQuestionSent: "June 21, 2026",
+
+  // Each contact shows an ID/handle (always visible). Clicking copies it.
+  // Platforms with a profile URL also get an "open ↗" link. WeChat = copy only.
+  contacts: {
+    wechat:    { id: "rose_wx16" },
+    linkedin:  { id: "in/rose-zhao", url: "https://www.linkedin.com/in/example" },
+    instagram: { id: "@rose.zhao",   url: "https://instagram.com/example" },
+    x:         { id: "@rosezhao",    url: "https://x.com/example" }
+    // facebook omitted here — simply won't render
+  },
+
+  // Universities newest-first. High school is separate and only shown
+  // when the alum did NOT graduate from BCIS.
+  universities: [
+    { degree: "MDes", major: "Interaction Design", org: "Dartmouth College", location: "Hanover, USA", start: 2020, end: 2022 },
+    { degree: "BSc", major: "Computer Science", org: "Georgia Institute of Technology", location: "Atlanta, USA", start: 2016, end: 2020 }
+  ],
+  highSchool: { org: "Shanghai World Foreign Language School", location: "Shanghai, China", start: 2013, end: 2016 },
+
+  // Work newest-first. end: null means "Current".
+  work: [
+    { role: "Product Designer", org: "Google", location: "Tokyo, Japan", start: 2022, end: null },
+    { role: "UX Design Intern", org: "Shopify", location: "Remote", start: 2021, end: 2021 }
+  ],
+
+  recommendations: [
+    { name: "Shen, Yifeng", preferred: "Tom", classYear: 2022, location: "Tokyo, Japan",  exp: "Software Engineer · Google",   similarCount: 3, mentoring: true },
+    { name: "Liu, Han", preferred: "Hannah", classYear: 2015, location: "Beijing, China", exp: "Product Manager · ByteDance", similarCount: 2, mentoring: false },
+    { name: "Marco Rossi", classYear: 2017, location: "Milan, Italy", exp: "MDes · Dartmouth College", similarCount: 3, mentoring: true },
+    { name: "Kim, Ji-woo", preferred: "Grace", classYear: 2018, location: "Seoul, Korea", exp: "UX Researcher · Naver", similarCount: 2, mentoring: false }
+  ]
+};
+
+/* ── icons ── */
+var ICON = {
+  wechat: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8.5 11a1 1 0 100-2 1 1 0 000 2zM5 11a1 1 0 100-2 1 1 0 000 2z"/><path d="M2 8.5C2 5.46 5.13 3 9 3s7 2.46 7 5.5c0 1.37-.6 2.62-1.59 3.6L15 15l-2.77-1.16A8.6 8.6 0 019 14C5.13 14 2 11.54 2 8.5z"/><path d="M16 19l2.5 1-.4-2.1A4.8 4.8 0 0020 14.5C20 12.01 17.76 10 15 10"/></svg>',
+  linkedin: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z"/></svg>',
+  instagram: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.3"/></svg>',
+  x: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2.6h3.3l-7.2 8.2L23 21.4h-6.6l-5.2-6.8-6 6.8H1.9l7.7-8.8L1.3 2.6H8l4.7 6.2 6.2-6.2zm-1.2 16.8h1.8L7.1 4.5H5.2l12.5 14.9z"/></svg>',
+  facebook: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>',
+  ask: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>',
+  pin: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  copy: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>',
+  ext: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
+  clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>'
+};
+var CONTACT_ORDER = ["wechat","linkedin","instagram","x","facebook"];
+var CONTACT_NAME = { wechat:"WeChat", linkedin:"LinkedIn", instagram:"Instagram", x:"X", facebook:"Facebook" };
+
+/* ── helpers ── */
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function years(start, end){ return esc(start) + " — " + (end ? esc(end) : "Present"); }
+function nameHTML(name, preferred){
+  return esc(name) + (preferred ? ' <span class="pref">(' + esc(preferred) + ')</span>' : '');
+}
+function nameText(name, preferred){
+  return name + (preferred ? ' (' + preferred + ')' : '');
+}
+function initials(name, preferred){
+  var fam = (name.split(',')[0].trim().split(/\s+/)[0]) || '';
+  var a = fam ? fam[0] : '';
+  var b;
+  if (preferred){ b = preferred.trim()[0] || ''; }
+  else { var parts = name.replace(/,/g,'').trim().split(/\s+/); b = parts.length > 1 ? parts[parts.length-1][0] : ''; }
+  return (a + b).toUpperCase();
+}
+
+/* ── render: identity ── */
+function renderIdentity(){
+  document.getElementById('name').innerHTML = nameHTML(DATA.name, DATA.preferred);
+  document.getElementById('crumbName').textContent = nameText(DATA.name, DATA.preferred);
+  document.title = nameText(DATA.name, DATA.preferred) + " | BCIS Alumni Network";
+  document.getElementById('class').textContent = "Class of " + DATA.classYear;
+  document.getElementById('avatarFallback').textContent = initials(DATA.name, DATA.preferred);
+  var av = document.getElementById('avatar');
+  av.src = DATA.photo; av.alt = DATA.name;
+  av.addEventListener('error', function(){ av.classList.add('is-missing'); }, { once:true });
+
+  if (DATA.residence){
+    var res = document.getElementById('residence');
+    res.innerHTML = ICON.pin + esc(DATA.residence);
+    res.hidden = false;
+  }
+
+  var labels = [];
+  if (DATA.mentoring) labels.push('<span class="avail">Mentoring</span>');
+  if (DATA.openToQuestions) labels.push('<span class="avail">Open to questions</span>');
+  document.getElementById('labels').innerHTML = labels.join('');
+}
+
+/* ── render: ask panel (only when open to questions) ── */
+function renderAsk(){
+  if (!DATA.openToQuestions) return;
+  document.getElementById('askMount').innerHTML =
+    '<div class="ask" id="ask">' +
+      '<div class="ask-title">' + ICON.ask + ' Ask a question</div>' +
+      (DATA.lastQuestionSent ? '<div class="ask-last">' + ICON.clock + '<span>Your last question to ' + esc(DATA.preferred || DATA.name.split(',')[0].trim()) + ' &middot; <b>' + esc(DATA.lastQuestionSent) + '</b></span></div>' : '') +
+      '<textarea class="ask-input" id="askInput" rows="4" aria-label="Your question" ' +
+        'placeholder="Please type your question here — it will be sent as an email."></textarea>' +
+      '<p class="ask-consent"><span>*</span> By using this function I agree to share my email with the mentor.</p>' +
+      '<button class="ask-send" id="askSend" disabled>Send question <span aria-hidden="true">&rarr;</span></button>' +
+    '</div>';
+
+  var input = document.getElementById('askInput');
+  var send  = document.getElementById('askSend');
+  input.addEventListener('input', function(){ send.disabled = input.value.trim().length === 0; });
+  send.addEventListener('click', function(){
+    if (input.value.trim().length === 0) return;
+    document.getElementById('ask').innerHTML =
+      '<div class="ask-sent">' +
+        '<div class="ask-sent-check">' + ICON.check + '</div>' +
+        '<div><strong>Question sent</strong>' +
+        '<p>' + esc(DATA.name.split(',')[0]) + ' will be notified and can reply straight to your email.</p></div>' +
+      '</div>';
+  });
+}
+
+/* ── render: contacts — show the ID, click to copy, ↗ to open (if linkable) ── */
+function renderContacts(){
+  var c = DATA.contacts || {};
+  var rows = CONTACT_ORDER.filter(function(k){ return c[k]; }).map(function(k){
+    var v = c[k];
+    var trail = v.url
+      ? '<a class="crow-trail" href="' + esc(v.url) + '" target="_blank" rel="noopener" aria-label="Open ' + CONTACT_NAME[k] + ' profile">' + ICON.ext + '</a>'
+      : '<span class="crow-trail" aria-hidden="true">' + ICON.copy + '</span>';
+    return '<div class="crow">' +
+      '<span class="crow-ic">' + ICON[k] + '</span>' +
+      '<button class="crow-id" data-copy="' + esc(v.id) + '" title="Click to copy" aria-label="Copy ' + CONTACT_NAME[k] + ' ID ' + esc(v.id) + '">' + esc(v.id) + '</button>' +
+      trail + '</div>';
+  });
+  if (!rows.length) return;
+  document.getElementById('contactsMount').innerHTML =
+    '<div class="contacts"><div class="rail-label">Contact</div><div class="contact-rows">' + rows.join('') + '</div></div>';
+
+  [].forEach.call(document.querySelectorAll('.crow-id'), function(btn){
+    var id = btn.getAttribute('data-copy');
+    btn.addEventListener('click', function(){
+      function done(){ btn.textContent = 'Copied ✓'; btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = id; btn.classList.remove('copied'); }, 1300); }
+      if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(id).then(done, done); }
+      else { done(); }
+    });
+  });
+}
+
+/* ── render: one experience entry ── */
+function expEntry(role, org, location, start, end){
+  var current = !end;
+  return '<div class="exp' + (current ? ' current' : '') + '">' +
+    '<div class="exp-top"><div class="exp-role">' + role + (current ? '<span class="current-tag">Current</span>' : '') +
+      '</div><div class="exp-years">' + years(start, end) + '</div></div>' +
+    (org ? '<div class="exp-org">' + esc(org) + '</div>' : '') +
+    (location ? '<div class="exp-loc">' + ICON.pin + esc(location) + '</div>' : '') +
+    '</div>';
+}
+
+/* ── render: experiences (education + work) ── */
+function renderExperiences(){
+  // Work first (most recent professional life leads), then Education.
+  var work = (DATA.work || []).map(function(w){ return expEntry(esc(w.role), w.org, w.location, w.start, w.end); });
+  var workHtml = work.length
+    ? '<div class="exp-group"><div class="exp-group-head"><h2>Work Experience</h2><span class="rule"></span></div>' +
+      '<div class="timeline">' + work.join('') + '</div></div>'
+    : '';
+
+  // Education: universities (newest-first) then high school (only if not a BCIS grad)
+  var edu = [];
+  (DATA.universities || []).forEach(function(u){
+    var role = esc(u.degree) + (u.major ? ' &middot; ' + esc(u.major) : '');
+    edu.push(expEntry(role, u.org, u.location, u.start, u.end));
+  });
+  if (DATA.highSchool){
+    edu.push(expEntry('High School Diploma', DATA.highSchool.org, DATA.highSchool.location, DATA.highSchool.start, DATA.highSchool.end));
+  }
+  var eduHtml = edu.length
+    ? '<div class="exp-group"><div class="exp-group-head"><h2>Education</h2><span class="rule"></span></div>' +
+      '<div class="timeline">' + edu.join('') + '</div></div>'
+    : '';
+
+  document.getElementById('experiences').innerHTML = workHtml + eduHtml;
+}
+
+/* ── render: recommendations ── */
+function renderRecommendations(){
+  var recs = DATA.recommendations || [];
+  if (!recs.length){ document.getElementById('recommendations').remove(); return; }
+  var cards = recs.map(function(r){
+    var mentor = r.mentoring ? '<span class="rec-mentor">Mentor</span>' : '';
+    var count = r.similarCount || 1;
+    var reason = '<span class="rec-tag">' + count + ' similar attribute' + (count === 1 ? '' : 's') + '</span>';
+    var sub = 'Class of ' + esc(r.classYear) + (r.location ? ' &middot; ' + ICON.pin + esc(r.location) : '');
+    return '<a class="rec-card" href="alumni-profile.html">' +
+      '<span class="rec-av">' + initials(r.name, r.preferred) + '</span>' +
+      '<div class="rec-body">' +
+        '<div class="rec-name-row"><span class="rec-name">' + nameHTML(r.name, r.preferred) + '</span>' + mentor + reason + '</div>' +
+        (r.exp ? '<div class="rec-exp">' + esc(r.exp) + '</div>' : '') +
+        '<div class="rec-sub">' + sub + '</div>' +
+      '</div>' +
+    '</a>';
+  });
+  document.getElementById('recommendations').innerHTML =
+    '<div class="rec-head"><div class="rec-label">Similar alumni</div><h2>People you might <em>connect</em> with</h2></div>' +
+    '<div class="rec-grid">' + cards.join('') + '</div>';
+}
+
+/* ── scroll reveal ── */
+function initReveal(){
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion:reduce)').matches){
+    els.forEach(function(e){ e.classList.add('in'); }); return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold: 0.12 });
+  els.forEach(function(e){ io.observe(e); });
+}
+
+/* ── boot ── */
+renderIdentity();
+renderAsk();
+renderContacts();
+renderExperiences();
+renderRecommendations();
+initReveal();
+</script>
+</body>
+</html>
